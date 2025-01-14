@@ -6,11 +6,11 @@ class Modelo_Restaurante(BaseModel):
     Nombre: str
     Direccion: str
     Telefono: str
-    Calificacion: str
+    Calificacion: int
     Horarios: str
     Imagen_destacada : str
     Google_maps : str
-    Rango_de_precios: str
+    Rango_de_precios: int
     ID_Ubicacion: str
     ID_categorias: str
     ID_Etiqueta : str

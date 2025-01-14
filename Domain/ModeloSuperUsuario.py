@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Modelo_Cliente(BaseModel):
+class Modelo_Super_Usuario(BaseModel):
     ID_Key: str
     Nombre: str
     Apellido: str

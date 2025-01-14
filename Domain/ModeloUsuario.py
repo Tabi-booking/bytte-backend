@@ -7,7 +7,7 @@ class Modelo_Usuario(BaseModel):
     Telefono : str
     Correo : str
     Contrasena: str
-    Tipo_Documeto: str
+    Tipo_Documento: str
     Numero_Documento: str
     Rol: str
     ID_Restaurante: str

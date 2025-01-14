@@ -1,11 +1,11 @@
-from Domain.ModeloUsuario import Modelo_Usuario
+from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 import mysql.connector
 from typing import List
 
-class Infraestructura_Usuario():
+class Infraestructura_Super_Usuario():
     def __init__(self) -> None:
         pass 
-    def ingresar_usuario(self, modelousuario:Modelo_Usuario)-> Modelo_Usuario:
+    def ingresar_super_usuario(self, modelosuperusuario:Modelo_Super_Usuario)-> Modelo_Super_Usuario:
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
@@ -14,18 +14,18 @@ class Infraestructura_Usuario():
         )
         try:
             cursor=db.cursor()
-            args=[modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.Rol,modelousuario.ID_Restaurante]
-            cursor.callproc("CrearUsuario",args)
+            args=[modelosuperusuario.Nombre,modelosuperusuario.Apellido,modelosuperusuario.Telefono,modelosuperusuario.Correo,modelosuperusuario.Contrasena,modelosuperusuario.Tipo_Documento,modelosuperusuario.Numero_Documento]
+            cursor.callproc("CrearSuperUsuario",args)
             db.commit()
             cursor.close()
-            modelousuario.resultado = "Ingresar Usuario Exitoso"
+            modelosuperusuario.resultado = "Ingresar Super Usuario Exitoso"
         except Exception as ex:
-            modelousuario.resultado = f"Ingresar Usuario Fallido:{ex}"
+            modelosuperusuario.resultado = f"Ingresar Super Usuario Fallido:{ex}"
         finally:
             db.disconnect()
-        return modelousuario
+        return modelosuperusuario
     
-    def modificar_usuario(self, ID_Key: str, modelousuario: Modelo_Usuario) -> Modelo_Usuario:
+    def modificar_super_usuario(self, ID_Key: str, modelosuperusuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
@@ -34,18 +34,18 @@ class Infraestructura_Usuario():
         )
         try:
             cursor = db.cursor()
-            args=[ID_Key,modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.Rol,modelousuario.ID_Restaurante]
-            cursor.callproc("ActualizarUsuario", args)
+            args=[ID_Key,modelosuperusuario.Nombre,modelosuperusuario.Apellido,modelosuperusuario.Telefono,modelosuperusuario.Correo,modelosuperusuario.Contrasena,modelosuperusuario.Tipo_Documento,modelosuperusuario.Numero_Documento]
+            cursor.callproc("ActualizarSuperUsuario", args)
             db.commit()
             cursor.close()
-            modelousuario.resultado = "Modificar Usuario Exitoso"
+            modelosuperusuario.resultado = "Modificar Super Usuario Exitoso"
         except Exception as ex:
-            modelousuario.resultado = f"Modificar Usuario Fallido: {ex} "
+            modelosuperusuario.resultado = f"Modificar Super Usuario Fallido: {ex} "
         finally:
             db.disconnect()
-        return modelousuario
+        return modelosuperusuario
 
-    def retirar_usuario(self, ID_Key: str, modelousuario: Modelo_Usuario) -> Modelo_Usuario:
+    def retirar_super_usuario(self, ID_Key: str, modelosuperusuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
@@ -55,17 +55,17 @@ class Infraestructura_Usuario():
         try:
             cursor = db.cursor()
             args = [ID_Key]
-            cursor.callproc("EliminarUsuario", args)
+            cursor.callproc("EliminarSuperUsuario", args)
             db.commit()
             cursor.close()
-            modelousuario.resultado = "Retirar Usuario Exitoso"
+            modelosuperusuario.resultado = "Retirar Super Usuario Exitoso"
         except Exception as ex:
-            modelousuario.resultado = f"Retirar Usuario Fallido: {ex}"
+            modelosuperusuario.resultado = f"Retirar Super Usuario Fallido: {ex}"
         finally:
             db.disconnect()
-        return modelousuario
+        return modelosuperusuario
 
-    def consultar_usuario(self) -> List[Modelo_Usuario]:
+    def consultar_super_usuario(self) -> List[Modelo_Super_Usuario]:
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
@@ -75,7 +75,7 @@ class Infraestructura_Usuario():
         results = []
         try:
             cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerUsuarios")
+            cursor.callproc("LeerSuperUsuarios")
 
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
@@ -90,15 +90,13 @@ class Infraestructura_Usuario():
                     "Contrasena": raw_result.get('Contrasena'),
                     "Tipo_Documento": raw_result.get('Tipo_Documento'),
                     "Numero_Documento": raw_result.get('Numero_Documento'),
-                    "Rol": raw_result.get('Rol'),
-                    "ID_Restaurante": raw_result.get('ID_Restaurante'),
                     'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
                 }
-                results.append(Modelo_Usuario(**formatted_result))
+                results.append(Modelo_Super_Usuario(**formatted_result))
 
             cursor.close()
         except Exception as ex:
-            results = [Modelo_Usuario(
+            results = [Modelo_Super_Usuario(
                 ID_Key='',
                 Nombre='',
                 Apellido='',
@@ -107,15 +105,13 @@ class Infraestructura_Usuario():
                 Contrasena='',
                 Tipo_Documento='',
                 Numero_Documento='',
-                Rol='',
-                ID_Restaurante='',
-                resultado=f'Consultar Usuario Fallido: {ex}'
+                resultado=f'Consultar Super Usuario Fallido: {ex}'
             )]
         finally:
             db.disconnect()
         return results
 
-    def consultar_usuario_id(self, ID_Key: str) -> List[Modelo_Usuario]:
+    def consultar_super_usuario_id(self, ID_Key: str) -> List[Modelo_Super_Usuario]:
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
@@ -125,7 +121,7 @@ class Infraestructura_Usuario():
         results = []
         try:
             cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerUsuarioPorId",[ID_Key])
+            cursor.callproc("LeerSuperUsuarioPorId",[ID_Key])
 
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
@@ -140,15 +136,13 @@ class Infraestructura_Usuario():
                     "Contrasena": raw_result.get('Contrasena'),
                     "Tipo_Documento": raw_result.get('Tipo_Documento'),
                     "Numero_Documento": raw_result.get('Numero_Documento'),
-                    "Rol": raw_result.get('Rol'),
-                    "ID_Restaurante": raw_result.get('ID_Restaurante'),
                     'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
                 }
-                results.append(Modelo_Usuario(**formatted_result))
+                results.append(Modelo_Super_Usuario(**formatted_result))
 
             cursor.close()
         except Exception as ex:
-            results = [Modelo_Usuario(
+            results = [Modelo_Super_Usuario(
                 ID_Key='',
                 Nombre='',
                 Apellido='',
@@ -157,9 +151,7 @@ class Infraestructura_Usuario():
                 Contrasena='',
                 Tipo_Documento='',
                 Numero_Documento='',
-                Rol='',
-                ID_Restaurante='',
-                resultado=f'Consultar Usuario Fallido: {ex}'
+                resultado=f'Consultar Super Usuario Fallido: {ex}'
             )]
         finally:
             db.disconnect()
