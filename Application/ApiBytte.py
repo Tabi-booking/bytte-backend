@@ -18,6 +18,8 @@ from Domain.ModeloEtiquetas import Modelo_Etiquetas
 from Infraestructure.InfraestructuraEtiquetas import Infraestructura_Etiquetas
 from Domain.ModeloPagos import Modelo_Pagos
 from Infraestructure.InfraestructuraPagos import Infraestructura_Pagos
+from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
+from Infraestructure.InfraestructuraSuperUsuario import Infraestructura_Super_Usuario
 from typing import List
 
 app:FastAPI = FastAPI(
@@ -471,6 +473,62 @@ async def consultar_etiquetas() -> List[Modelo_Etiquetas]:
 async def consultar_etiquetas_id(ID_Key: str) -> List[Modelo_Etiquetas]:
     infraestructuraetiquetas = Infraestructura_Etiquetas()
     return infraestructuraetiquetas.consultar_etiquetas_id(ID_Key)
+
+#####################################
+@app.post(
+    "/IngresarSuperUsuario",
+    response_model= Modelo_Super_Usuario,
+    description="Ingresar Super_Usuario",
+    summary="Ingresar Super_Usuario",
+    tags=["Super Usuario"]
+)
+async def ingresar_super_usuario(modelosuper_usuario: Modelo_Super_Usuario)->Modelo_Super_Usuario:
+    infraestructurasuper_usuario = Infraestructura_Super_Usuario()
+    return infraestructurasuper_usuario.ingresar_super_usuario(modelosuper_usuario)
+
+@app.put(
+    "/ModificarSuperUsuario",
+    response_model= Modelo_Super_Usuario,
+    description="Modificar Super_Usuario",
+    summary="Modificar Super_Usuario",
+    tags=["Super Usuario"]
+)
+async def modificar_super_usuario(ID_Key:str,modelosuper_usuario: Modelo_Super_Usuario)->Modelo_Super_Usuario:
+    infraestructurasuper_usuario = Infraestructura_Super_Usuario()
+    return infraestructurasuper_usuario.modificar_super_usuario(ID_Key, modelosuper_usuario)
+
+@app.delete(
+    "/EliminarSuperUsuario",
+    response_model= Modelo_Super_Usuario,
+    description="Eliminar Super_Usuario",
+    summary="Eliminar Super_Usuario",
+    tags=["Super Usuario"]
+)
+async def retirar_super_usuario(ID_Key: str, modelosuper_usuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
+    infraestructurasuper_usuario = Infraestructura_Super_Usuario()
+    return infraestructurasuper_usuario.retirar_super_usuario(ID_Key, modelosuper_usuario)
+
+@app.get(
+    "/ConsultarSuperUsuario",
+    response_model=List[Modelo_Super_Usuario],
+    description="Consultar Super_Usuario",
+    summary="Consultar Super_Usuario",
+    tags=["Super Usuario"]
+)
+async def consultar_super_usuario() -> List[Modelo_Super_Usuario]:
+    infraestructurasuper_usuario = Infraestructura_Super_Usuario()
+    return infraestructurasuper_usuario.consultar_super_usuario()
+
+@app.get(
+    "/ConsultarSuperUsuarioId",
+    response_model=List[Modelo_Super_Usuario],
+    description="Consultar Super_Usuario por ID",
+    summary="Consultar Super_Usuario por ID",
+    tags=["Super Usuario"]
+)
+async def consultar_super_usuario_id(ID_Key: str) -> List[Modelo_Super_Usuario]:
+    infraestructurasuper_usuario = Infraestructura_Super_Usuario()
+    return infraestructurasuper_usuario.consultar_super_usuario_id(ID_Key)
 
 #####################################
 @app.post(
