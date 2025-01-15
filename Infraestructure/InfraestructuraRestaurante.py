@@ -7,7 +7,7 @@ class Infraestructura_Restaurante():
         pass 
     def ingresar_restaurante(self, modelorestaurante:Modelo_Restaurante)-> Modelo_Restaurante:
         db = mysql.connector.connect(
-            host="82.197.82.62",
+            host="srv1618.hstgr.io",
             user="u637372565_anomaly",
             password="9VS6s*M@2li",
             database="u637372565_bytte_db"
@@ -27,7 +27,7 @@ class Infraestructura_Restaurante():
     
     def modificar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
         db = mysql.connector.connect(
-            host="82.197.82.62",
+            host="srv1618.hstgr.io",
             user="u637372565_anomaly",
             password="9VS6s*M@2li",
             database="u637372565_bytte_db"
@@ -47,7 +47,7 @@ class Infraestructura_Restaurante():
 
     def retirar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
         db = mysql.connector.connect(
-            host="82.197.82.62",
+            host="srv1618.hstgr.io",
             user="u637372565_anomaly",
             password="9VS6s*M@2li",
             database="u637372565_bytte_db"
@@ -67,7 +67,7 @@ class Infraestructura_Restaurante():
 
     def consultar_restaurante(self) -> List[Modelo_Restaurante]:
         db = mysql.connector.connect(
-            host="82.197.82.62",
+            host="srv1618.hstgr.io",
             user="u637372565_anomaly",
             password="9VS6s*M@2li",
             database="u637372565_bytte_db"
@@ -123,7 +123,7 @@ class Infraestructura_Restaurante():
 
     def consultar_restaurante_id(self, ID_Key: str) -> List[Modelo_Restaurante]:
         db = mysql.connector.connect(
-            host="82.197.82.62",
+            host="srv1618.hstgr.io",
             user="u637372565_anomaly",
             password="9VS6s*M@2li",
             database="u637372565_bytte_db"
