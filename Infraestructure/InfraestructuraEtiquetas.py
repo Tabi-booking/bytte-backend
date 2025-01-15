@@ -9,7 +9,7 @@ class Infraestructura_Etiquetas():
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
-            password="9VS6s*M@2li",
+            password="Bytte-Back-2024",
             database="u637372565_bytte_db"
         )
         try:
@@ -29,7 +29,7 @@ class Infraestructura_Etiquetas():
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
-            password="9VS6s*M@2li",
+            password="Bytte-Back-2024",
             database="u637372565_bytte_db"
         )
         try:
@@ -49,7 +49,7 @@ class Infraestructura_Etiquetas():
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
-            password="9VS6s*M@2li",
+            password="Bytte-Back-2024",
             database="u637372565_bytte_db"
         )
         try:
@@ -69,7 +69,7 @@ class Infraestructura_Etiquetas():
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
-            password="9VS6s*M@2li",
+            password="Bytte-Back-2024",
             database="u637372565_bytte_db"
         )
         results = []
@@ -106,7 +106,7 @@ class Infraestructura_Etiquetas():
         db = mysql.connector.connect(
             host="srv1618.hstgr.io",
             user="u637372565_anomaly",
-            password="9VS6s*M@2li",
+            password="Bytte-Back-2024",
             database="u637372565_bytte_db"
         )
         results = []

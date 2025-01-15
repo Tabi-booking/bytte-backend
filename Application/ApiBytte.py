@@ -1,5 +1,5 @@
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+import mysql.connector
 from Domain.ModeloRestaurante import Modelo_Restaurante
 from Infraestructure.InfraestructuraRestaurante import Infraestructura_Restaurante
 from Domain.ModeloReserva import Modelo_Reserva
@@ -36,7 +36,13 @@ app:FastAPI = FastAPI(
 )
 async def ingresar_restaurante(modelorestaurante: Modelo_Restaurante)->Modelo_Restaurante:
     infraestructurarestaurante = Infraestructura_Restaurante()
-    return infraestructurarestaurante.ingresar_restaurante(modelorestaurante)
+    try:
+        return infraestructurarestaurante.ingresar_restaurante(modelorestaurante)
+    except mysql.connector.Error as err:
+        if err.errno == 1045:
+            raise HTTPException(status_code=401, detail="Access denied for user. Please check your database credentials.")
+        else:
+            raise HTTPException(status_code=500, detail=f"Database connection error: {err}")
 
 @app.put(
     "/ModificarRestaurante",

@@ -6,13 +6,14 @@ class Infraestructura_Categorias():
     def __init__(self) -> None:
         pass 
     def ingresar_categoria(self, modelocategoria:Modelo_Categorias)-> Modelo_Categorias:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor=db.cursor()
             args=[modelocategoria.Nombre]
             cursor.callproc("CrearCategoria",args)
@@ -22,17 +23,19 @@ class Infraestructura_Categorias():
         except Exception as ex:
             modelocategoria.resultado = f"Ingresar Categoria Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocategoria
     
     def modificar_categoria(self, ID_Key: str, modelocategoria: Modelo_Categorias) -> Modelo_Categorias:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor()
             args = [ID_Key, modelocategoria.Nombre]
             cursor.callproc("ActualizarCategoria", args)
@@ -42,17 +45,19 @@ class Infraestructura_Categorias():
         except Exception as ex:
             modelocategoria.resultado = f"Modificar Categoria Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocategoria
 
     def retirar_categoria(self, ID_Key: str, modelocategoria: Modelo_Categorias) -> Modelo_Categorias:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarCategoria", args)
@@ -62,19 +67,20 @@ class Infraestructura_Categorias():
         except Exception as ex:
             modelocategoria.resultado = f"Retirar Categoria Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocategoria
 
     def consultar_categoria(self) -> List[Modelo_Categorias]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
-
+        db = None
         results = []
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerCategorias")
 
@@ -82,7 +88,6 @@ class Infraestructura_Categorias():
                 raw_results = item.fetchall()
 
             for raw_result in raw_results:
-                # Convertir cada resultado a un dict compatible con ModeloTaller
                 formatted_result = {
                     'ID_Key': raw_result.get('ID_Key'),
                     'Nombre': raw_result.get('Nombre'),
@@ -98,18 +103,20 @@ class Infraestructura_Categorias():
                 resultado=f'Consultar Categoria Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return results
 
     def consultar_categoria_id(self, ID_Key: str) -> List[Modelo_Categorias]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor(dictionary=True)
             cursor.callproc("ConsultarCategoriaPorId",[ID_Key])
 
@@ -132,5 +139,6 @@ class Infraestructura_Categorias():
                 resultado=f'Consultar Categoria Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
-        return results 
+            if db and db.is_connected():
+                db.close()
+        return results

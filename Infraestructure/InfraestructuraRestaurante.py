@@ -1,79 +1,96 @@
 from Domain.ModeloRestaurante import Modelo_Restaurante
 import mysql.connector
+from mysql.connector import Error
 from typing import List
 
 class Infraestructura_Restaurante():
     def __init__(self) -> None:
         pass 
     def ingresar_restaurante(self, modelorestaurante:Modelo_Restaurante)-> Modelo_Restaurante:
-        db = mysql.connector.connect(
-            host="82.197.82.62",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor=db.cursor()
             args=[modelorestaurante.id_acceso,modelorestaurante.Nombre,modelorestaurante.Direccion,modelorestaurante.Telefono,modelorestaurante.Calificacion,modelorestaurante.Horarios,modelorestaurante.Imagen_destacada,modelorestaurante.Google_maps,modelorestaurante.Rango_de_precios,modelorestaurante.ID_Ubicacion,modelorestaurante.ID_categorias,modelorestaurante.ID_Etiqueta]
             cursor.callproc("CrearRestaurante",args)
             db.commit()
             cursor.close()
             modelorestaurante.resultado = "Ingresar Restaurante Exitoso"
-        except Exception as ex:
-            modelorestaurante.resultado = f"Ingresar Restaurante Fallido:{ex}"
+        except Error as e:
+            print(f"Error: {e}")
+            modelorestaurante.resultado = f"Ingresar Restaurante Fallido:{e}"
+            raise
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                cursor.close()
+                db.close()
         return modelorestaurante
     
     def modificar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
-        db = mysql.connector.connect(
-            host="82.197.82.62",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor()
             args=[ID_Key,modelorestaurante.id_acceso,modelorestaurante.Nombre,modelorestaurante.Direccion,modelorestaurante.Telefono,modelorestaurante.Calificacion,modelorestaurante.Horarios,modelorestaurante.Imagen_destacada,modelorestaurante.Google_maps,modelorestaurante.Rango_de_precios,modelorestaurante.ID_Ubicacion,modelorestaurante.ID_categorias,modelorestaurante.ID_Etiqueta]
             cursor.callproc("ActualizarRestaurante", args)
             db.commit()
             cursor.close()
             modelorestaurante.resultado = "Modificar Restaurante Exitoso"
-        except Exception as ex:
-            modelorestaurante.resultado = f"Modificar Restaurante Fallido: {ex} "
+        except Error as e:
+            print(f"Error: {e}")
+            modelorestaurante.resultado = f"Modificar Restaurante Fallido: {e} "
+            raise
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                cursor.close()
+                db.close()
         return modelorestaurante
 
     def retirar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
-        db = mysql.connector.connect(
-            host="82.197.82.62",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarRestaurante", args)
             db.commit()
             cursor.close()
             modelorestaurante.resultado = "Retirar Restaurante Exitoso"
-        except Exception as ex:
-            modelorestaurante.resultado = f"Retirar Restaurante Fallido: {ex}"
+        except Error as e:
+            print(f"Error: {e}")
+            modelorestaurante.resultado = f"Retirar Restaurante Fallido: {e}"
+            raise
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                cursor.close()
+                db.close()
         return modelorestaurante
 
     def consultar_restaurante(self) -> List[Modelo_Restaurante]:
-        db = mysql.connector.connect(
-            host="82.197.82.62",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerRestaurantes")
 
@@ -100,7 +117,8 @@ class Infraestructura_Restaurante():
                 results.append(Modelo_Restaurante(**formatted_result))
 
             cursor.close()
-        except Exception as ex:
+        except Error as e:
+            print(f"Error: {e}")
             results = [Modelo_Restaurante(
                 ID_Key='',
                 id_acceso='',
@@ -115,21 +133,25 @@ class Infraestructura_Restaurante():
                 ID_Ubicacion='',
                 ID_categorias='',
                 ID_Etiqueta='',
-                resultado=f'Consultar Restaurante Fallido: {ex}'
+                resultado=f'Consultar Restaurante Fallido: {e}'
             )]
+            raise
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                cursor.close()
+                db.close()
         return results
 
     def consultar_restaurante_id(self, ID_Key: str) -> List[Modelo_Restaurante]:
-        db = mysql.connector.connect(
-            host="82.197.82.62",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = mysql.connector.connect(
+                host="srv1618.hstgr.io",
+                user="u637372565_anomaly",
+                password="Bytte-Back-2024",
+                database="u637372565_bytte_db"
+            )
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerRestaurantePorId",[ID_Key])
 
@@ -156,7 +178,8 @@ class Infraestructura_Restaurante():
                 results.append(Modelo_Restaurante(**formatted_result))
 
             cursor.close()
-        except Exception as ex:
+        except Error as e:
+            print(f"Error: {e}")
             results = [Modelo_Restaurante(
                 ID_Key='',
                 id_acceso='',
@@ -171,8 +194,11 @@ class Infraestructura_Restaurante():
                 ID_Ubicacion='',
                 ID_categorias='',
                 ID_Etiqueta='',
-                resultado=f'Consultar Restaurante Fallido: {ex}'
+                resultado=f'Consultar Restaurante Fallido: {e}'
             )]
+            raise
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                cursor.close()
+                db.close()
         return results
