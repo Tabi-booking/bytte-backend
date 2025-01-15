@@ -71,7 +71,7 @@ class Infraestructura_Categorias():
             for raw_result in raw_results:
                 formatted_result = {
                     'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
+                    'Nombre': raw_result.get('Nombre') or '',
                     'resultado': 'Exitoso'
                 }
                 results.append(Modelo_Categorias(**formatted_result))
@@ -102,7 +102,7 @@ class Infraestructura_Categorias():
             for raw_result in raw_results:
                 formatted_result = {
                     'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
+                    'Nombre': raw_result.get('Nombre') or '',
                     'resultado': 'Exitoso'
                 }
                 results.append(Modelo_Categorias(**formatted_result))
