@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 import mysql.connector
 from Domain.ModeloRestaurante import Modelo_Restaurante
 from Infraestructure.InfraestructuraRestaurante import Infraestructura_Restaurante
@@ -21,11 +22,37 @@ from Infraestructure.InfraestructuraPagos import Infraestructura_Pagos
 from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 from Infraestructure.InfraestructuraSuperUsuario import Infraestructura_Super_Usuario
 from typing import List
+import uvicorn
+import os
+from fastapi.responses import JSONResponse
+from json import JSONDecodeError
 
-app:FastAPI = FastAPI(
-    tittle="Web API Bytte",
+app = FastAPI(
+    title="Web API Bytte",
     description="WEB API BYTTE"
 )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=400,
+        content={"detail": exc.errors()},
+    )
+
+@app.exception_handler(JSONDecodeError)
+async def json_decode_exception_handler(request: Request, exc: JSONDecodeError):
+    return JSONResponse(
+        status_code=400,
+        content={"detail": "JSON decode error. Please check your request body."},
+    )
+
 #####################################
 @app.post(
     "/IngresarRestaurante",
@@ -591,3 +618,7 @@ async def consultar_pagos() -> List[Modelo_Pagos]:
 async def consultar_pagos_id(ID_Key: str) -> List[Modelo_Pagos]:
     infraestructurapagos = Infraestructura_Pagos()
     return infraestructurapagos.consultar_pagos_id(ID_Key)
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

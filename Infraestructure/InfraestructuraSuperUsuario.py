@@ -1,4 +1,5 @@
 from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Super_Usuario():
     def __init__(self) -> None:
         pass 
     def ingresar_super_usuario(self, modelosuperusuario:Modelo_Super_Usuario)-> Modelo_Super_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelosuperusuario.Nombre,modelosuperusuario.Apellido,modelosuperusuario.Telefono,modelosuperusuario.Correo,modelosuperusuario.Contrasena,modelosuperusuario.Tipo_Documento,modelosuperusuario.Numero_Documento]
             cursor.callproc("CrearSuperUsuario",args)
@@ -26,13 +23,9 @@ class Infraestructura_Super_Usuario():
         return modelosuperusuario
     
     def modificar_super_usuario(self, ID_Key: str, modelosuperusuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelosuperusuario.Nombre,modelosuperusuario.Apellido,modelosuperusuario.Telefono,modelosuperusuario.Correo,modelosuperusuario.Contrasena,modelosuperusuario.Tipo_Documento,modelosuperusuario.Numero_Documento]
             cursor.callproc("ActualizarSuperUsuario", args)
@@ -46,13 +39,9 @@ class Infraestructura_Super_Usuario():
         return modelosuperusuario
 
     def retirar_super_usuario(self, ID_Key: str, modelosuperusuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarSuperUsuario", args)
@@ -66,14 +55,10 @@ class Infraestructura_Super_Usuario():
         return modelosuperusuario
 
     def consultar_super_usuario(self) -> List[Modelo_Super_Usuario]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerSuperUsuarios")
 
@@ -112,14 +97,10 @@ class Infraestructura_Super_Usuario():
         return results
 
     def consultar_super_usuario_id(self, ID_Key: str) -> List[Modelo_Super_Usuario]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerSuperUsuarioPorId",[ID_Key])
 

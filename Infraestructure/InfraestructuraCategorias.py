@@ -1,4 +1,5 @@
 from Domain.ModeloCategorias import Modelo_Categorias
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -8,12 +9,7 @@ class Infraestructura_Categorias():
     def ingresar_categoria(self, modelocategoria:Modelo_Categorias)-> Modelo_Categorias:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelocategoria.Nombre]
             cursor.callproc("CrearCategoria",args)
@@ -30,12 +26,7 @@ class Infraestructura_Categorias():
     def modificar_categoria(self, ID_Key: str, modelocategoria: Modelo_Categorias) -> Modelo_Categorias:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key, modelocategoria.Nombre]
             cursor.callproc("ActualizarCategoria", args)
@@ -52,12 +43,7 @@ class Infraestructura_Categorias():
     def retirar_categoria(self, ID_Key: str, modelocategoria: Modelo_Categorias) -> Modelo_Categorias:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarCategoria", args)
@@ -75,12 +61,7 @@ class Infraestructura_Categorias():
         db = None
         results = []
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerCategorias")
 
@@ -111,12 +92,7 @@ class Infraestructura_Categorias():
         db = None
         results = []
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("ConsultarCategoriaPorId",[ID_Key])
 

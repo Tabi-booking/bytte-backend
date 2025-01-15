@@ -1,4 +1,5 @@
 from Domain.ModeloUsuario import Modelo_Usuario
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Usuario():
     def __init__(self) -> None:
         pass 
     def ingresar_usuario(self, modelousuario:Modelo_Usuario)-> Modelo_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.Rol,modelousuario.ID_Restaurante]
             cursor.callproc("CrearUsuario",args)
@@ -26,13 +23,9 @@ class Infraestructura_Usuario():
         return modelousuario
     
     def modificar_usuario(self, ID_Key: str, modelousuario: Modelo_Usuario) -> Modelo_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.Rol,modelousuario.ID_Restaurante]
             cursor.callproc("ActualizarUsuario", args)
@@ -46,13 +39,9 @@ class Infraestructura_Usuario():
         return modelousuario
 
     def retirar_usuario(self, ID_Key: str, modelousuario: Modelo_Usuario) -> Modelo_Usuario:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarUsuario", args)
@@ -66,14 +55,10 @@ class Infraestructura_Usuario():
         return modelousuario
 
     def consultar_usuario(self) -> List[Modelo_Usuario]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerUsuarios")
 
@@ -116,14 +101,10 @@ class Infraestructura_Usuario():
         return results
 
     def consultar_usuario_id(self, ID_Key: str) -> List[Modelo_Usuario]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerUsuarioPorId",[ID_Key])
 

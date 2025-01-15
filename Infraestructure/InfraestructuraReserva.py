@@ -1,4 +1,5 @@
 from Domain.ModeloReserva import Modelo_Reserva
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Reserva():
     def __init__(self) -> None:
         pass 
     def ingresar_reserva(self, modeloreserva:Modelo_Reserva)-> Modelo_Reserva:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
             cursor.callproc("CrearReserva",args)
@@ -26,13 +23,9 @@ class Infraestructura_Reserva():
         return modeloreserva
     
     def modificar_reserva(self, ID_Key: str, modeloreserva: Modelo_Reserva) -> Modelo_Reserva:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
             cursor.callproc("ActualizarReserva", args)
@@ -46,13 +39,9 @@ class Infraestructura_Reserva():
         return modeloreserva
 
     def retirar_reserva(self, ID_Key: str, modeloreserva: Modelo_Reserva) -> Modelo_Reserva:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarReserva", args)
@@ -66,14 +55,10 @@ class Infraestructura_Reserva():
         return modeloreserva
 
     def consultar_reserva(self) -> List[Modelo_Reserva]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerReservas")
 
@@ -116,14 +101,10 @@ class Infraestructura_Reserva():
         return results
 
     def consultar_reserva_id(self, ID_Key: str) -> List[Modelo_Reserva]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerReservaPorId",[ID_Key])
 

@@ -1,4 +1,5 @@
 from Domain.ModeloRestaurante import Modelo_Restaurante
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from mysql.connector import Error
 from typing import List
@@ -9,12 +10,7 @@ class Infraestructura_Restaurante():
     def ingresar_restaurante(self, modelorestaurante:Modelo_Restaurante)-> Modelo_Restaurante:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelorestaurante.id_acceso,modelorestaurante.Nombre,modelorestaurante.Direccion,modelorestaurante.Telefono,modelorestaurante.Calificacion,modelorestaurante.Horarios,modelorestaurante.Imagen_destacada,modelorestaurante.Google_maps,modelorestaurante.Rango_de_precios,modelorestaurante.ID_Ubicacion,modelorestaurante.ID_categorias,modelorestaurante.ID_Etiqueta]
             cursor.callproc("CrearRestaurante",args)
@@ -34,12 +30,7 @@ class Infraestructura_Restaurante():
     def modificar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelorestaurante.id_acceso,modelorestaurante.Nombre,modelorestaurante.Direccion,modelorestaurante.Telefono,modelorestaurante.Calificacion,modelorestaurante.Horarios,modelorestaurante.Imagen_destacada,modelorestaurante.Google_maps,modelorestaurante.Rango_de_precios,modelorestaurante.ID_Ubicacion,modelorestaurante.ID_categorias,modelorestaurante.ID_Etiqueta]
             cursor.callproc("ActualizarRestaurante", args)
@@ -59,12 +50,7 @@ class Infraestructura_Restaurante():
     def retirar_restaurante(self, ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
         db = None
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarRestaurante", args)
@@ -85,12 +71,7 @@ class Infraestructura_Restaurante():
         db = None
         results = []
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerRestaurantes")
 
@@ -146,12 +127,7 @@ class Infraestructura_Restaurante():
         db = None
         results = []
         try:
-            db = mysql.connector.connect(
-                host="srv1618.hstgr.io",
-                user="u637372565_anomaly",
-                password="Bytte-Back-2024",
-                database="u637372565_bytte_db"
-            )
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerRestaurantePorId",[ID_Key])
 

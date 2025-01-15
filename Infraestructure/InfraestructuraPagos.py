@@ -1,4 +1,5 @@
 from Domain.ModeloPagos import Modelo_Pagos
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Pagos():
     def __init__(self) -> None:
         pass 
     def ingresar_pagos(self, modelopago:Modelo_Pagos)-> Modelo_Pagos:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
             cursor.callproc("CrearPago",args)
@@ -22,17 +19,14 @@ class Infraestructura_Pagos():
         except Exception as ex:
             modelopago.resultado = f"Ingresar Pago Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopago
     
     def modificar_pagos(self, ID_Key: str, modelopago: Modelo_Pagos) -> Modelo_Pagos:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
             cursor.callproc("ActualizarPago", args)
@@ -42,17 +36,14 @@ class Infraestructura_Pagos():
         except Exception as ex:
             modelopago.resultado = f"Modificar Pago Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopago
 
     def retirar_pagos(self, ID_Key: str, modelopago: Modelo_Pagos) -> Modelo_Pagos:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarPago", args)
@@ -62,18 +53,15 @@ class Infraestructura_Pagos():
         except Exception as ex:
             modelopago.resultado = f"Retirar Pago Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopago
 
     def consultar_pagos(self) -> List[Modelo_Pagos]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerPagos")
 
@@ -116,18 +104,15 @@ class Infraestructura_Pagos():
                 resultado=f'Consultar Pago Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return results
 
     def consultar_pagos_id(self, ID_Key: str) -> List[Modelo_Pagos]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="Bytte-Back-2024",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerPagoPorId",[ID_Key])
 
@@ -170,5 +155,6 @@ class Infraestructura_Pagos():
                 resultado=f'Consultar Pago Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
-        return results 
+            if db and db.is_connected():
+                db.close()
+        return results
