@@ -1,4 +1,5 @@
 from Domain.ModeloPedido import Modelo_Pedido
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Pedido():
     def __init__(self) -> None:
         pass 
     def ingresar_pedido(self, modelopedido:Modelo_Pedido)-> Modelo_Pedido:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelopedido.Cantidad, modelopedido.Descripcion, modelopedido.Precio_Unitario, modelopedido.Importe]
             cursor.callproc("CrearPedido",args)
@@ -22,17 +19,14 @@ class Infraestructura_Pedido():
         except Exception as ex:
             modelopedido.resultado = f"Ingresar Pedido Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopedido
     
     def modificar_pedido(self, ID_Key: str, modelopedido: Modelo_Pedido) -> Modelo_Pedido:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelopedido.Cantidad, modelopedido.Descripcion, modelopedido.Precio_Unitario, modelopedido.Importe]
             cursor.callproc("ActualizarPedido", args)
@@ -42,17 +36,14 @@ class Infraestructura_Pedido():
         except Exception as ex:
             modelopedido.resultado = f"Modificar Pedido Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopedido
 
     def retirar_pedido(self, ID_Key: str, modelopedido: Modelo_Pedido) -> Modelo_Pedido:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarPedido", args)
@@ -62,18 +53,15 @@ class Infraestructura_Pedido():
         except Exception as ex:
             modelopedido.resultado = f"Retirar Pedido Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelopedido
 
     def consultar_pedido(self) -> List[Modelo_Pedido]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerPedidos")
 
@@ -102,18 +90,15 @@ class Infraestructura_Pedido():
                 resultado=f'Consultar Pedido Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return results
 
     def consultar_pedido_id(self, ID_Key: str) -> List[Modelo_Pedido]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerPedidoPorId",[ID_Key])
 
@@ -142,5 +127,6 @@ class Infraestructura_Pedido():
                 resultado=f'Consultar Pedido Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
-        return results   
+            if db and db.is_connected():
+                db.close()
+        return results

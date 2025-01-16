@@ -1,4 +1,5 @@
 from Domain.ModeloCliente import Modelo_Cliente
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Cliente():
     def __init__(self) -> None:
         pass 
     def ingresar_cliente(self, modelocliente:Modelo_Cliente)-> Modelo_Cliente:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
             cursor.callproc("CrearCliente",args)
@@ -22,17 +19,14 @@ class Infraestructura_Cliente():
         except Exception as ex:
             modelocliente.resultado = f"Ingresar Cliente Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocliente
     
     def modificar_cliente(self, ID_Key: str, modelocliente: Modelo_Cliente) -> Modelo_Cliente:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
             cursor.callproc("ActualizarCliente", args)
@@ -42,17 +36,14 @@ class Infraestructura_Cliente():
         except Exception as ex:
             modelocliente.resultado = f"Modificar Cliente Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocliente
 
     def retirar_cliente(self, ID_Key: str, modelocliente: Modelo_Cliente) -> Modelo_Cliente:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarCliente", args)
@@ -62,18 +53,15 @@ class Infraestructura_Cliente():
         except Exception as ex:
             modelocliente.resultado = f"Retirar Cliente Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modelocliente
 
     def consultar_cliente(self) -> List[Modelo_Cliente]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerClientes")
 
@@ -109,18 +97,15 @@ class Infraestructura_Cliente():
                 resultado=f'Consultar Cliente Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return results
 
     def consultar_cliente_id(self, ID_Key: str) -> List[Modelo_Cliente]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerClientePorId",[ID_Key])
 
@@ -155,5 +140,6 @@ class Infraestructura_Cliente():
                 resultado=f'Consultar Cliente Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
-        return results   
+            if db and db.is_connected():
+                db.close()
+        return results

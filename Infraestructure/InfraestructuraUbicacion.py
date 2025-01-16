@@ -1,4 +1,5 @@
 from Domain.ModeloUbicacion import Modelo_Ubicacion
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,13 +7,9 @@ class Infraestructura_Ubicacion():
     def __init__(self) -> None:
         pass 
     def ingresar_ubicacion(self, modeloubicacion:Modelo_Ubicacion)-> Modelo_Ubicacion:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
             args=[modeloubicacion.Pais,modeloubicacion.Departamento,modeloubicacion.Ciudad,modeloubicacion.Barrio]
             cursor.callproc("CrearUbicacion",args)
@@ -26,13 +23,9 @@ class Infraestructura_Ubicacion():
         return modeloubicacion
     
     def modificar_ubicacion(self, ID_Key: str, modeloubicacion: Modelo_Ubicacion) -> Modelo_Ubicacion:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key,modeloubicacion.Pais,modeloubicacion.Departamento,modeloubicacion.Ciudad,modeloubicacion.Barrio]
             cursor.callproc("ActualizarUbicacion", args)
@@ -46,13 +39,9 @@ class Infraestructura_Ubicacion():
         return modeloubicacion
 
     def retirar_ubicacion(self, ID_Key: str, modeloubicacion: Modelo_Ubicacion) -> Modelo_Ubicacion:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarUbicacion", args)
@@ -66,14 +55,10 @@ class Infraestructura_Ubicacion():
         return modeloubicacion
 
     def consultar_ubicacion(self) -> List[Modelo_Ubicacion]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerUbicacions")
 
@@ -106,14 +91,10 @@ class Infraestructura_Ubicacion():
         return results
 
     def consultar_ubicacion_id(self, ID_Key: str) -> List[Modelo_Ubicacion]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerUbicacionPorId",[ID_Key])
 

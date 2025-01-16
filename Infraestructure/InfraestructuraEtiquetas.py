@@ -1,4 +1,5 @@
 from Domain.ModeloEtiquetas import Modelo_Etiquetas
+from Infraestructure.Database import get_db_connection
 import mysql.connector
 from typing import List
 
@@ -6,15 +7,11 @@ class Infraestructura_Etiquetas():
     def __init__(self) -> None:
         pass 
     def ingresar_etiquetas(self, modeloetiqueta:Modelo_Etiquetas)-> Modelo_Etiquetas:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor=db.cursor()
-            args=[modeloetiqueta.Nombre, modeloetiqueta.svg]
+            args=[modeloetiqueta.Nombre or '', modeloetiqueta.svg or '']
             cursor.callproc("CrearEtiqueta",args)
             db.commit()
             cursor.close()
@@ -22,19 +19,16 @@ class Infraestructura_Etiquetas():
         except Exception as ex:
             modeloetiqueta.resultado = f"Ingresar Etiqueta Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloetiqueta
     
     def modificar_etiquetas(self, ID_Key: str, modeloetiqueta: Modelo_Etiquetas) -> Modelo_Etiquetas:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modeloetiqueta.Nombre, modeloetiqueta.svg]
+            args=[ID_Key, modeloetiqueta.Nombre or '', modeloetiqueta.svg or '']
             cursor.callproc("ActualizarEtiqueta", args)
             db.commit()
             cursor.close()
@@ -42,17 +36,14 @@ class Infraestructura_Etiquetas():
         except Exception as ex:
             modeloetiqueta.resultado = f"Modificar Etiqueta Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloetiqueta
 
     def retirar_etiquetas(self, ID_Key: str, modeloetiqueta: Modelo_Etiquetas) -> Modelo_Etiquetas:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         try:
+            db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
             cursor.callproc("EliminarEtiqueta", args)
@@ -62,18 +53,15 @@ class Infraestructura_Etiquetas():
         except Exception as ex:
             modeloetiqueta.resultado = f"Retirar Etiqueta Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloetiqueta
 
     def consultar_etiquetas(self) -> List[Modelo_Etiquetas]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerEtiquetas")
 
@@ -81,11 +69,10 @@ class Infraestructura_Etiquetas():
                 raw_results = item.fetchall()
 
             for raw_result in raw_results:
-                # Convertir cada resultado a un dict compatible con ModeloTaller
                 formatted_result = {
                     'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
-                    'svg': raw_result.get('svg'),
+                    'Nombre': raw_result.get('Nombre') or '',
+                    'svg': raw_result.get('svg') or '',
                     'resultado': 'Exitoso'  
                 }
                 results.append(Modelo_Etiquetas(**formatted_result))
@@ -99,18 +86,15 @@ class Infraestructura_Etiquetas():
                 resultado=f'Consultar Etiqueta Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return results
 
     def consultar_etiquetas_id(self, ID_Key: str) -> List[Modelo_Etiquetas]:
-        db = mysql.connector.connect(
-            host="srv1618.hstgr.io",
-            user="u637372565_anomaly",
-            password="9VS6s*M@2li",
-            database="u637372565_bytte_db"
-        )
+        db = None
         results = []
         try:
+            db = get_db_connection()
             cursor = db.cursor(dictionary=True)
             cursor.callproc("LeerEtiquetaPorId",[ID_Key])
 
@@ -120,8 +104,8 @@ class Infraestructura_Etiquetas():
             for raw_result in raw_results:
                 formatted_result = {
                     'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
-                    'svg': raw_result.get('svg'),
+                    'Nombre': raw_result.get('Nombre') or '',
+                    'svg': raw_result.get('svg') or '',
                     'resultado': 'Exitoso'  
                 } 
                 results.append(Modelo_Etiquetas(**formatted_result))
@@ -135,5 +119,6 @@ class Infraestructura_Etiquetas():
                 resultado=f'Consultar Etiqueta Fallido: {ex}'
             )]
         finally:
-            db.disconnect()
-        return results   
+            if db and db.is_connected():
+                db.close()
+        return results

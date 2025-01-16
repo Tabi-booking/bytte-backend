@@ -4,9 +4,8 @@ Bytte es un ERP para restaurantes. Este documento explica cómo montar y utiliza
 
 ## Requisitos
 
-- Node.js (versión 14 o superior)
-- npm (versión 6 o superior)
-- MongoDB (versión 4 o superior)
+- Python (versión 3.8 o superior)
+- MySQL
 
 ## Instalación
 
@@ -16,27 +15,35 @@ Bytte es un ERP para restaurantes. Este documento explica cómo montar y utiliza
     cd bytte-backend
     ```
 
-2. Instala las dependencias:
+2. Crea y activa un entorno virtual:
     ```bash
-    npm install
+    python -m venv venv
+    source venv/bin/activate  # En Windows usa `venv\Scripts\activate`
     ```
 
-3. Configura las variables de entorno:
+3. Instala las dependencias:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Configura las variables de entorno:
     Crea un archivo `.env` en la raíz del proyecto y añade las siguientes variables:
     ```env
-    PORT=3000
-    MONGODB_URI=mongodb://localhost:27017/bytte
-    JWT_SECRET=tu_secreto_jwt
+    PORT=8000
+    DB_HOST=srv1618.hstgr.io
+    DB_USER=u637372565_anomaly
+    DB_PASSWORD=Bytte-Back-2024
+    DB_NAME=u637372565_bytte_db
     ```
 
 ## Uso
 
 1. Inicia el servidor:
     ```bash
-    npm start
+    uvicorn Application.ApiBytte:app --reload
     ```
 
-2. El servidor estará corriendo en `http://localhost:3000`.
+2. El servidor estará corriendo en `http://localhost:8000`.
 
 ## Endpoints
 
