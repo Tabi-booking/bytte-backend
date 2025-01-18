@@ -1,6 +1,5 @@
 from Domain.ModeloEtiquetas import Modelo_Etiquetas
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Etiquetas():
@@ -58,67 +57,81 @@ class Infraestructura_Etiquetas():
         return modeloetiqueta
 
     def consultar_etiquetas(self) -> List[Modelo_Etiquetas]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerEtiquetas")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre') or '',
-                    'svg': raw_result.get('svg') or '',
-                    'resultado': 'Exitoso'  
-                }
-                results.append(Modelo_Etiquetas(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'svg': raw_result[2],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Etiquetas(**cliente_dict))
 
             cursor.close()
-        except Exception as ex:
-            results = [Modelo_Etiquetas(
-                ID_Key='', 
-                Nombre ='',
-                svg = '', 
-                resultado=f'Consultar Etiqueta Fallido: {ex}'
-            )]
-        finally:
-            if db and db.is_connected():
-                db.close()
-        return results
 
+        except Exception as ex:
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Etiquetas(
+                ID_Key='',
+                Nombre='',
+                svg='',
+                resultado=f"Consultar Etiqueta Fallido: {ex}"
+            )]
+
+        finally:
+            db.close()
+
+        return resultado
+    
     def consultar_etiquetas_id(self, ID_Key: str) -> List[Modelo_Etiquetas]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerEtiquetaPorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerEtiquetaPorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre') or '',
-                    'svg': raw_result.get('svg') or '',
-                    'resultado': 'Exitoso'  
-                } 
-                results.append(Modelo_Etiquetas(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'svg': raw_result[2],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Etiquetas(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Etiquetas(
-                ID_Key='', 
-                Nombre ='',
-                svg = '', 
-                resultado=f'Consultar Etiqueta Fallido: {ex}'
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Etiquetas(
+                ID_Key='',
+                Nombre='',
+                svg='',
+                resultado=f"Consultar Etiqueta Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado

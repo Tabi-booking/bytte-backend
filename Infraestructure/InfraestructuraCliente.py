@@ -1,6 +1,5 @@
 from Domain.ModeloCliente import Modelo_Cliente
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Cliente():
@@ -58,88 +57,101 @@ class Infraestructura_Cliente():
         return modelocliente
 
     def consultar_cliente(self) -> List[Modelo_Cliente]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerClientes")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                # Convertir cada resultado a un dict compatible con ModeloTaller
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
-                    'Apellido': raw_result.get('Apellido'),
-                    'Telefono': raw_result.get('Telefono'),
-                    'Correo': raw_result.get('Correo'),
-                    'Contrasena': raw_result.get('Contrasena'),
-                    'Tipo_Documento': raw_result.get('Tipo_Documento'),
-                    'Numero_Documento': raw_result.get('Numero_Documento'),
-                    'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Cliente(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'Apellido': raw_result[2],
+                        'Telefono': raw_result[3],
+                        'Correo': raw_result[4],
+                        'Contrasena': raw_result[5],
+                        'Tipo_Documento': raw_result[6],
+                        'Numero_Documento': raw_result[7],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Cliente(**cliente_dict))
 
             cursor.close()
-        except Exception as ex:
-            results = [Modelo_Cliente(
-                ID_Key='', 
-                Nombre ='',
-                Apellido = '',
-                Telefono = '',
-                Correo = '',
-                Contrasena='', 
-                Tipo_Documento='',
-                Numero_Documento='', 
-                resultado=f'Consultar Cliente Fallido: {ex}'
-            )]
-        finally:
-            if db and db.is_connected():
-                db.close()
-        return results
 
+        except Exception as ex:
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Cliente(
+                ID_Key='',
+                Nombre='',
+                Apellido='',
+                Telefono='',
+                Correo='',
+                Contrasena='',
+                Tipo_Documento='',
+                Numero_Documento='',
+                resultado=f"Consultar Cliente Fallido: {ex}"
+            )]
+
+        finally:
+            db.close()
+
+        return resultado 
+           
     def consultar_cliente_id(self, ID_Key: str) -> List[Modelo_Cliente]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerClientePorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerClientePorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre'),
-                    'Apellido': raw_result.get('Apellido'),
-                    'Telefono': raw_result.get('Telefono'),
-                    'Correo': raw_result.get('Correo'),
-                    'Contrasena': raw_result.get('Contrasena'),
-                    'Tipo_Documento': raw_result.get('Tipo_Documento'),
-                    'Numero_Documento': raw_result.get('Numero_Documento'),
-                    'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Cliente(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'Apellido': raw_result[2],
+                        'Telefono': raw_result[3],
+                        'Correo': raw_result[4],
+                        'Contrasena': raw_result[5],
+                        'Tipo_Documento': raw_result[6],
+                        'Numero_Documento': raw_result[7],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Cliente(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Cliente(
-                ID_Key='', 
-                Nombre ='',
-                Apellido = '',
-                Telefono = '',
-                Correo = '',
-                Contrasena='', 
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Cliente(
+                ID_Key='',
+                Nombre='',
+                Apellido='',
+                Telefono='',
+                Correo='',
+                Contrasena='',
                 Tipo_Documento='',
-                Numero_Documento='', 
-                resultado=f'Consultar Cliente Fallido: {ex}'
+                Numero_Documento='',
+                resultado=f"Consultar Cliente Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado 

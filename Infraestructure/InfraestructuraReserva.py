@@ -1,6 +1,5 @@
 from Domain.ModeloReserva import Modelo_Reserva
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Reserva():
@@ -55,93 +54,109 @@ class Infraestructura_Reserva():
         return modeloreserva
 
     def consultar_reserva(self) -> List[Modelo_Reserva]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerReservas")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Cantidad_personas': str(raw_result.get('Cantidad_personas')),
-                    'Fecha': raw_result.get('Fecha'),
-                    'Hora': raw_result.get('Hora'),
-                    'Codigo_reserva': raw_result.get('Codigo_reserva'),
-                    'Comentarios': raw_result.get('Comentarios'),
-                    'Precio': str(raw_result.get('Precio')),
-                    'Preorden': str(raw_result.get('Preorden')),
-                    'ID_Restaurante': raw_result.get('ID_Restaurante'),
-                    'ID_Cliente': raw_result.get('ID_Cliente'),
-                    'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Reserva(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Cantidad_personas': str(raw_result[1]),
+                        'Fecha': raw_result[2],
+                        'Hora': raw_result[3],
+                        'Codigo_reserva': raw_result[4],
+                        'Comentarios': raw_result[5],
+                        'Precio': str(raw_result[6]),
+                        'Preorden': str(raw_result[7]),
+                        'ID_Restaurante': raw_result[8],
+                        'ID_Cliente': raw_result[9],                                             
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Reserva(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Reserva(
-                ID_Key='', 
-                Cantidad_personas = 0,
-                Fecha = '',
-                Hora = '',
-                Codigo_reserva = '',
-                Comentarios = '',
-                Precio = 0,
-                Preorden = 0,
-                ID_Restaurante = '',
-                ID_Cliente = '',
-                resultado=f'Consultar Reserva Fallido: {ex}'
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Reserva(
+                ID_Key='',
+                Cantidad_personas=0,
+                Fecha='',
+                Hora='',
+                Codigo_reserva='',
+                Comentarios='',
+                Precio=0,
+                Preorden=0,
+                ID_Restaurante='',
+                ID_Cliente='',
+                resultado=f"Consultar Reserva Fallido: {ex}"
             )]
+
         finally:
-            db.disconnect()
-        return results
+            db.close()
+
+        return resultado
 
     def consultar_reserva_id(self, ID_Key: str) -> List[Modelo_Reserva]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerReservaPorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerReservaPorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Cantidad_personas': str(raw_result.get('Cantidad_personas')),
-                    'Fecha': raw_result.get('Fecha'),
-                    'Hora': raw_result.get('Hora'),
-                    'Codigo_reserva': raw_result.get('Codigo_reserva'),
-                    'Comentarios': raw_result.get('Comentarios'),
-                    'Precio': str(raw_result.get('Precio')),
-                    'Preorden': str(raw_result.get('Preorden')),
-                    'ID_Restaurante': raw_result.get('ID_Restaurante'),
-                    'ID_Cliente': raw_result.get('ID_Cliente'),
-                    'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Reserva(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Cantidad_personas': str(raw_result[1]),
+                        'Fecha': raw_result[2],
+                        'Hora': raw_result[3],
+                        'Codigo_reserva': raw_result[4],
+                        'Comentarios': raw_result[5],
+                        'Precio': str(raw_result[6]),
+                        'Preorden': str(raw_result[7]),
+                        'ID_Restaurante': raw_result[8],
+                        'ID_Cliente': raw_result[9],                                             
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Reserva(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Reserva(
-                ID_Key='', 
-                Cantidad_personas = 0,
-                Fecha = '',
-                Hora = '',
-                Codigo_reserva = '',
-                Comentarios = '',
-                Precio = 0,
-                Preorden = 0,
-                ID_Restaurante = '',
-                ID_Cliente = '',
-                resultado=f'Consultar Reserva Fallido: {ex}'
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Reserva(
+                ID_Key='',
+                Cantidad_personas=0,
+                Fecha='',
+                Hora='',
+                Codigo_reserva='',
+                Comentarios='',
+                Precio=0,
+                Preorden=0,
+                ID_Restaurante='',
+                ID_Cliente='',
+                resultado=f"Consultar Reserva Fallido: {ex}"
             )]
+
         finally:
-            db.disconnect()
-        return results  
+            db.close()
+
+        return resultado

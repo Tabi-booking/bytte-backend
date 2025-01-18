@@ -207,12 +207,12 @@ async def retirar_cliente(ID_Key: str, modelocliente: Modelo_Cliente) -> Modelo_
 
 @app.get(
     "/ConsultarCliente",
-    response_model=List[Modelo_Cliente],
+    response_model=list[Modelo_Cliente],
     description="Consultar Cliente",
     summary="Consultar Cliente",
     tags=["Cliente"]
 )
-async def consultar_cliente() -> List[Modelo_Cliente]:
+async def consultar_cliente() -> list[Modelo_Cliente]:
     infraestructuracliente = Infraestructura_Cliente()
     return infraestructuracliente.consultar_cliente()
 

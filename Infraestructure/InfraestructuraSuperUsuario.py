@@ -1,6 +1,5 @@
 from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Super_Usuario():
@@ -58,87 +57,101 @@ class Infraestructura_Super_Usuario():
         return modelosuper_usuario
 
     def consultar_super_usuario(self) -> List[Modelo_Super_Usuario]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerSuperUsuarios")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre') or '',
-                    'Apellido': raw_result.get('Apellido') or '',
-                    'Telefono': raw_result.get('Telefono') or '',
-                    'Correo': raw_result.get('Correo') or '',
-                    'Contrasena': raw_result.get('Contrasena') or '',
-                    'Tipo_Documento': raw_result.get('Tipo_Documento') or '',
-                    'Numero_Documento': raw_result.get('Numero_Documento') or '',
-                    'resultado': 'Exitoso'  
-                }
-                results.append(Modelo_Super_Usuario(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'Apellido': raw_result[2],
+                        'Telefono': raw_result[3],
+                        'Correo': raw_result[4],
+                        'Contrasena': raw_result[5],
+                        'Tipo_Documento': raw_result[6],
+                        'Numero_Documento': raw_result[7],                       
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Super_Usuario(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Super_Usuario(
-                ID_Key='', 
-                Nombre ='',
-                Apellido = '',
-                Telefono = '',
-                Correo = '',
-                Contrasena='', 
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Super_Usuario(
+                ID_Key='',
+                Nombre='',
+                Apellido='',
+                Telefono='',
+                Correo='',
+                Contrasena='',
                 Tipo_Documento='',
-                Numero_Documento='', 
-                resultado=f'Consultar Super Usuario Fallido: {ex}'
+                Numero_Documento='',
+                resultado=f"Consultar Super Usuario Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado 
 
     def consultar_super_usuario_id(self, ID_Key: str) -> List[Modelo_Super_Usuario]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerSuperUsuarioPorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerSuperUsuarioPorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre': raw_result.get('Nombre') or '',
-                    'Apellido': raw_result.get('Apellido') or '',
-                    'Telefono': raw_result.get('Telefono') or '',
-                    'Correo': raw_result.get('Correo') or '',
-                    'Contrasena': raw_result.get('Contrasena') or '',
-                    'Tipo_Documento': raw_result.get('Tipo_Documento') or '',
-                    'Numero_Documento': raw_result.get('Numero_Documento') or '',
-                    'resultado': 'Exitoso'  
-                }
-                results.append(Modelo_Super_Usuario(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'Apellido': raw_result[2],
+                        'Telefono': raw_result[3],
+                        'Correo': raw_result[4],
+                        'Contrasena': raw_result[5],
+                        'Tipo_Documento': raw_result[6],
+                        'Numero_Documento': raw_result[7],                       
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Super_Usuario(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Super_Usuario(
-                ID_Key='', 
-                Nombre ='',
-                Apellido = '',
-                Telefono = '',
-                Correo = '',
-                Contrasena='', 
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Super_Usuario(
+                ID_Key='',
+                Nombre='',
+                Apellido='',
+                Telefono='',
+                Correo='',
+                Contrasena='',
                 Tipo_Documento='',
-                Numero_Documento='', 
-                resultado=f'Consultar Super Usuario Fallido: {ex}'
+                Numero_Documento='',
+                resultado=f"Consultar Super Usuario Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado 

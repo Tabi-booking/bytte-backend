@@ -1,6 +1,5 @@
 from Domain.ModeloPedido import Modelo_Pedido
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Pedido():
@@ -58,75 +57,89 @@ class Infraestructura_Pedido():
         return modelopedido
 
     def consultar_pedido(self) -> List[Modelo_Pedido]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerPedidos")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Cantidad': str(raw_result.get('Cantidad')),
-                    'Descripcion': raw_result.get('Descripcion'),
-                    'Precio_Unitario': str(raw_result.get('Precio_Unitario')),
-                    'Importe': str(raw_result.get('Importe')),
-                    'resultado': 'Exitoso'  # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Pedido(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Cantidad': raw_result[1],
+                        'Descripcion': raw_result[2],
+                        'Precio_Unitario': raw_result[3],
+                        'Importe': raw_result[4],                        
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Pedido(**cliente_dict))
 
             cursor.close()
-        except Exception as ex:
-            results = [Modelo_Pedido(
-                ID_Key='', 
-                Cantidad = 0,
-                Descripcion = '',
-                Precio_Unitario = 0,
-                Importe = 0,
-                resultado=f'Consultar Pedido Fallido: {ex}'
-            )]
-        finally:
-            if db and db.is_connected():
-                db.close()
-        return results
 
+        except Exception as ex:
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Pedido(
+                ID_Key='',
+                Cantidad='',
+                Descripcion='',
+                Precio_Unitario='',
+                Importe='',
+                resultado=f"Consultar Pedido Fallido: {ex}"
+            )]
+
+        finally:
+            db.close()
+
+        return resultado
+    
     def consultar_pedido_id(self, ID_Key: str) -> List[Modelo_Pedido]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerPedidoPorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerPedidoPorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Cantidad': str(raw_result.get('Cantidad')),
-                    'Descripcion': raw_result.get('Descripcion'),
-                    'Precio_Unitario': str(raw_result.get('Precio_Unitario')),
-                    'Importe': str(raw_result.get('Importe')),
-                    'resultado': 'Exitoso' # Puedes ajustar el valor según sea necesario
-                }
-                results.append(Modelo_Pedido(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Cantidad': raw_result[1],
+                        'Descripcion': raw_result[2],
+                        'Precio_Unitario': raw_result[3],
+                        'Importe': raw_result[4],                        
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Pedido(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Pedido(
-                ID_Key='', 
-                Cantidad = 0,
-                Descripcion = '',
-                Precio_Unitario = 0,
-                Importe = 0,
-                resultado=f'Consultar Pedido Fallido: {ex}'
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Pedido(
+                ID_Key='',
+                Cantidad='',
+                Descripcion='',
+                Precio_Unitario='',
+                Importe='',
+                resultado=f"Consultar Pedido Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado

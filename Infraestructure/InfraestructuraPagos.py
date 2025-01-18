@@ -1,6 +1,5 @@
 from Domain.ModeloPagos import Modelo_Pagos
 from Infraestructure.Database import get_db_connection
-import mysql.connector
 from typing import List
 
 class Infraestructura_Pagos():
@@ -58,103 +57,117 @@ class Infraestructura_Pagos():
         return modelopago
 
     def consultar_pagos(self) -> List[Modelo_Pagos]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
+            cursor = db.cursor()
             cursor.callproc("LeerPagos")
-
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre_Cliente': raw_result.get('Nombre_Cliente'),
-                    'Subtotal': raw_result.get('Subtotal'),
-                    'Iva': raw_result.get('Iva'),
-                    'Total': raw_result.get('Total'),
-                    'Metodo_de_pago': raw_result.get('Metodo_de_pago'),
-                    'Fecha': raw_result.get('Fecha'),
-                    'Fecha_Vencimiento': raw_result.get('Fecha_Vencimiento'),
-                    'Tiempo': raw_result.get('Tiempo'),
-                    'Logo': raw_result.get('Logo'),
-                    'ID_Restaurante': raw_result.get('ID_Restaurante'),
-                    'ID_Pedido': raw_result.get('ID_Pedido'),
-                    'resultado': 'Exitoso'  
-                }
-                results.append(Modelo_Pagos(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre_Cliente': raw_result[1],
+                        'Subtotal': raw_result[2],
+                        'Iva': raw_result[3],
+                        'Total': raw_result[4],
+                        'Metodo_de_pago': raw_result[5],
+                        'Fecha': raw_result[6],
+                        'Fecha_Vencimiento': raw_result[7],
+                        'Tiempo': raw_result[8],
+                        'Logo': raw_result[9],
+                        'ID_Restaurante': raw_result[10],
+                        'ID_Pedido': raw_result[11],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Pagos(**cliente_dict))
 
             cursor.close()
-        except Exception as ex:
-            results = [Modelo_Pagos(
-                ID_Key='', 
-                Nombre_Cliente ='',
-                Subtotal = '',
-                Iva = '',
-                Total = '',
-                Metodo_de_pago = '',
-                Fecha = '',
-                Fecha_Vencimiento = '',
-                Tiempo = '',
-                Logo = '',
-                ID_Restaurante = '',
-                ID_Pedido = '',
-                resultado=f'Consultar Pago Fallido: {ex}'
-            )]
-        finally:
-            if db and db.is_connected():
-                db.close()
-        return results
 
+        except Exception as ex:
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Pagos(
+                ID_Key='',
+                Nombre_Cliente='',
+                Subtotal='',
+                Iva='',
+                Total='',
+                Metodo_de_pago='',
+                Fecha='',
+                Fecha_Vencimiento='',
+                Tiempo='',
+                Logo='',
+                ID_Restaurante='',
+                ID_Pedido='',
+                resultado=f"Consultar Pago Fallido: {ex}"
+            )]
+
+        finally:
+            db.close()
+
+        return resultado
+     
     def consultar_pagos_id(self, ID_Key: str) -> List[Modelo_Pagos]:
-        db = None
-        results = []
+        db = get_db_connection()
+        resultado = []
         try:
-            db = get_db_connection()
-            cursor = db.cursor(dictionary=True)
-            cursor.callproc("LeerPagoPorId",[ID_Key])
-
+            cursor = db.cursor()
+            cursor.callproc("LeerPagoPorID", [ID_Key])
+            
+            # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            for raw_result in raw_results:
-                formatted_result = {
-                    'ID_Key': raw_result.get('ID_Key'),
-                    'Nombre_Cliente': raw_result.get('Nombre_Cliente'),
-                    'Subtotal': raw_result.get('Subtotal'),
-                    'Iva': raw_result.get('Iva'),
-                    'Total': raw_result.get('Total'),
-                    'Metodo_de_pago': raw_result.get('Metodo_de_pago'),
-                    'Fecha': raw_result.get('Fecha'),
-                    'Fecha_Vencimiento': raw_result.get('Fecha_Vencimiento'),
-                    'Tiempo': raw_result.get('Tiempo'),
-                    'Logo': raw_result.get('Logo'),
-                    'ID_Restaurante': raw_result.get('ID_Restaurante'),
-                    'ID_Pedido': raw_result.get('ID_Pedido'),
-                    'resultado': 'Exitoso'  
-                }
-                results.append(Modelo_Pagos(**formatted_result))
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre_Cliente': raw_result[1],
+                        'Subtotal': raw_result[2],
+                        'Iva': raw_result[3],
+                        'Total': raw_result[4],
+                        'Metodo_de_pago': raw_result[5],
+                        'Fecha': raw_result[6],
+                        'Fecha_Vencimiento': raw_result[7],
+                        'Tiempo': raw_result[8],
+                        'Logo': raw_result[9],
+                        'ID_Restaurante': raw_result[10],
+                        'ID_Pedido': raw_result[11],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Pagos(**cliente_dict))
 
             cursor.close()
+
         except Exception as ex:
-            results = [Modelo_Pagos(
-                ID_Key='', 
-                Nombre_Cliente ='',
-                Subtotal = '',
-                Iva = '',
-                Total = '',
-                Metodo_de_pago = '',
-                Fecha = '',
-                Fecha_Vencimiento = '',
-                Tiempo = '',
-                Logo = '',
-                ID_Restaurante = '',
-                ID_Pedido = '',
-                resultado=f'Consultar Pago Fallido: {ex}'
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Pagos(
+                ID_Key='',
+                Nombre_Cliente='',
+                Subtotal='',
+                Iva='',
+                Total='',
+                Metodo_de_pago='',
+                Fecha='',
+                Fecha_Vencimiento='',
+                Tiempo='',
+                Logo='',
+                ID_Restaurante='',
+                ID_Pedido='',
+                resultado=f"Consultar Pago Fallido: {ex}"
             )]
+
         finally:
-            if db and db.is_connected():
-                db.close()
-        return results
+            db.close()
+
+        return resultado
