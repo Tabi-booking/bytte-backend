@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 from Domain.ModeloRestaurante import Modelo_Restaurante
 from Infraestructure.InfraestructuraRestaurante import Infraestructura_Restaurante
@@ -30,6 +31,15 @@ from json import JSONDecodeError
 app = FastAPI(
     title="Web API Bytte",
     description="WEB API BYTTE"
+)
+
+# Agregar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.getenv("FRONT_URL")],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.exception_handler(HTTPException)
