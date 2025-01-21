@@ -71,8 +71,8 @@ class Infraestructura_Reserva():
                     cliente_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
                         'Cantidad_personas': str(raw_result[1]),
-                        'Fecha': raw_result[2],
-                        'Hora': raw_result[3],
+                        'Fecha': str(raw_result[2]),
+                        'Hora': str(raw_result[3]),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
                         'Precio': str(raw_result[6]),
@@ -125,8 +125,8 @@ class Infraestructura_Reserva():
                     cliente_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
                         'Cantidad_personas': str(raw_result[1]),
-                        'Fecha': raw_result[2],
-                        'Hora': raw_result[3],
+                        'Fecha': str(raw_result[2]),
+                        'Hora': str(raw_result[3]),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
                         'Precio': str(raw_result[6]),

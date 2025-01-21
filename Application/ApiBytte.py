@@ -22,6 +22,8 @@ from Domain.ModeloPagos import Modelo_Pagos
 from Infraestructure.InfraestructuraPagos import Infraestructura_Pagos
 from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 from Infraestructure.InfraestructuraSuperUsuario import Infraestructura_Super_Usuario
+from Domain.ModeloRol import Modelo_Rol
+from Infraestructure.InfraestructuraRol import Infraestructura_Rol
 from typing import List
 import uvicorn
 import os
@@ -183,6 +185,63 @@ async def consultar_reserva_id(ID_Key: str) -> List[Modelo_Reserva]:
 
 #####################################
 @app.post(
+    "/IngresarRol",
+    response_model= Modelo_Rol,
+    description="Ingresar Rol",
+    summary="Ingresar Rol",
+    tags=["Rol"]
+)
+async def ingresar_rol(modelorol: Modelo_Rol)->Modelo_Rol:
+    infraestructurarol = Infraestructura_Rol()
+    return infraestructurarol.ingresar_rol(modelorol)
+
+@app.put(
+    "/ModificarRol",
+    response_model= Modelo_Rol,
+    description="Modificar Rol",
+    summary="Modificar Rol",
+    tags=["Rol"]
+)
+async def modificar_rol(ID_Key:str,modelorol: Modelo_Rol)->Modelo_Rol:
+    infraestructurarol = Infraestructura_Rol()
+    return infraestructurarol.modificar_rol(ID_Key, modelorol)
+
+@app.delete(
+    "/EliminarRol",
+    response_model= Modelo_Rol,
+    description="Eliminar Rol",
+    summary="Eliminar Rol",
+    tags=["Rol"]
+)
+async def retirar_rol(ID_Key: str, modelorol: Modelo_Rol) -> Modelo_Rol:
+    infraestructurarol = Infraestructura_Rol()
+    return infraestructurarol.retirar_rol(ID_Key, modelorol)
+
+@app.get(
+    "/ConsultarRol",
+    response_model=List[Modelo_Rol],
+    description="Consultar Rol",
+    summary="Consultar Rol",
+    tags=["Rol"]
+)
+async def consultar_rol() -> List[Modelo_Rol]:
+    infraestructurarol = Infraestructura_Rol()
+    return infraestructurarol.consultar_rol()
+
+@app.get(
+    "/ConsultarRolId",
+    response_model=List[Modelo_Rol],
+    description="Consultar Rol por ID",
+    summary="Consultar Rol por ID",
+    tags=["Rol"]
+)
+async def consultar_rol_id(ID_Key: str) -> List[Modelo_Rol]:
+    infraestructurarol = Infraestructura_Rol()
+    return infraestructurarol.consultar_rol_id(ID_Key)
+
+
+#####################################
+@app.post(
     "/IngresarCliente",
     response_model= Modelo_Cliente,
     description="Ingresar Cliente",
@@ -217,12 +276,12 @@ async def retirar_cliente(ID_Key: str, modelocliente: Modelo_Cliente) -> Modelo_
 
 @app.get(
     "/ConsultarCliente",
-    response_model=list[Modelo_Cliente],
+    response_model=List[Modelo_Cliente],
     description="Consultar Cliente",
     summary="Consultar Cliente",
     tags=["Cliente"]
 )
-async def consultar_cliente() -> list[Modelo_Cliente]:
+async def consultar_cliente() -> List[Modelo_Cliente]:
     infraestructuracliente = Infraestructura_Cliente()
     return infraestructuracliente.consultar_cliente()
 

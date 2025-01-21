@@ -9,6 +9,6 @@ class Modelo_Usuario(BaseModel):
     Contrasena: str
     Tipo_Documento: str
     Numero_Documento: str
-    Rol: str
+    ID_Rol: str
     ID_Restaurante: str
     resultado: str
