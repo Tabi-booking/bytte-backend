@@ -77,9 +77,9 @@ class Infraestructura_Reserva():
                     # Convertir cada tupla en un diccionario
                     reserva_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Cantidad_personas': raw_result[1],
-                        'Fecha': datetime.strptime(raw_result[2], '%Y-%m-%d') if raw_result[2] else datetime(1970, 1, 1),
-                        'Hora': datetime.strptime(raw_result[3], '%H:%M:%S').time() if raw_result[3] else datetime(1970, 1, 1, 0, 0, 0).time(),
+                        'Cantidad_personas': str(raw_result[1]),
+                        'Fecha': str(raw_result[2]),
+                        'Hora': str(raw_result[3]),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
                         'Precio': raw_result[6],
@@ -131,9 +131,9 @@ class Infraestructura_Reserva():
                     # Convertir cada tupla en un diccionario
                     reserva_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Cantidad_personas': raw_result[1],
-                        'Fecha': datetime.strptime(raw_result[2], '%Y-%m-%d') if raw_result[2] else datetime(1970, 1, 1),
-                        'Hora': datetime.strptime(raw_result[3], '%H:%M:%S').time() if raw_result[3] else datetime(1970, 1, 1, 0, 0, 0).time(),
+                        'Cantidad_personas': str(raw_result[1]),
+                        'Fecha': str(raw_result[2]),
+                        'Hora': str(raw_result[3]),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
                         'Precio': raw_result[6],
