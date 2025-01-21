@@ -63,6 +63,13 @@ async def json_decode_exception_handler(request: Request, exc: JSONDecodeError):
         content={"detail": "JSON decode error. Please check your request body."},
     )
 
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal Server Error: {exc}"},
+    )
+
 #####################################
 @app.post(
     "/IngresarRestaurante",
@@ -80,6 +87,8 @@ async def ingresar_restaurante(modelorestaurante: Modelo_Restaurante)->Modelo_Re
             raise HTTPException(status_code=401, detail="Access denied for user. Please check your database credentials.")
         else:
             raise HTTPException(status_code=500, detail=f"Database connection error: {err}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 @app.put(
     "/ModificarRestaurante",

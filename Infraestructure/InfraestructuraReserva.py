@@ -1,6 +1,10 @@
 from Domain.ModeloReserva import Modelo_Reserva
 from Infraestructure.Database import get_db_connection
-from typing import List
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Domain.ModeloReserva import Modelo_Reserva
+from datetime import datetime
 
 class Infraestructura_Reserva():
     def __init__(self) -> None:
@@ -18,7 +22,8 @@ class Infraestructura_Reserva():
         except Exception as ex:
             modeloreserva.resultado = f"Ingresar Reserva Fallido:{ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloreserva
     
     def modificar_reserva(self, ID_Key: str, modeloreserva: Modelo_Reserva) -> Modelo_Reserva:
@@ -26,7 +31,7 @@ class Infraestructura_Reserva():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
+            args=[ID_Key, modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
             cursor.callproc("ActualizarReserva", args)
             db.commit()
             cursor.close()
@@ -34,7 +39,8 @@ class Infraestructura_Reserva():
         except Exception as ex:
             modeloreserva.resultado = f"Modificar Reserva Fallido: {ex} "
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloreserva
 
     def retirar_reserva(self, ID_Key: str, modeloreserva: Modelo_Reserva) -> Modelo_Reserva:
@@ -50,7 +56,8 @@ class Infraestructura_Reserva():
         except Exception as ex:
             modeloreserva.resultado = f"Retirar Reserva Fallido: {ex}"
         finally:
-            db.disconnect()
+            if db and db.is_connected():
+                db.close()
         return modeloreserva
 
     def consultar_reserva(self) -> List[Modelo_Reserva]:
@@ -64,25 +71,25 @@ class Infraestructura_Reserva():
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            # Si hay resultados, los transformamos en objetos de tipo Reserva
             if raw_results:
                 for raw_result in raw_results:
                     # Convertir cada tupla en un diccionario
-                    cliente_dict = {
+                    reserva_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Cantidad_personas': str(raw_result[1]),
-                        'Fecha': raw_result[2],
-                        'Hora': raw_result[3],
+                        'Cantidad_personas': raw_result[1],
+                        'Fecha': datetime.strptime(raw_result[2], '%Y-%m-%d') if raw_result[2] else datetime(1970, 1, 1),
+                        'Hora': datetime.strptime(raw_result[3], '%H:%M:%S').time() if raw_result[3] else datetime(1970, 1, 1, 0, 0, 0).time(),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
-                        'Precio': str(raw_result[6]),
-                        'Preorden': str(raw_result[7]),
+                        'Precio': raw_result[6],
+                        'Preorden': raw_result[7],
                         'ID_Restaurante': raw_result[8],
-                        'ID_Cliente': raw_result[9],                                             
+                        'ID_Cliente': raw_result[9],
                         'resultado': 'Exitoso'
                     }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Reserva(**cliente_dict))
+                    # Convertir el diccionario en un objeto Reserva y agregarlo al resultado
+                    resultado.append(Modelo_Reserva(**reserva_dict))
 
             cursor.close()
 
@@ -91,12 +98,12 @@ class Infraestructura_Reserva():
             resultado = [Modelo_Reserva(
                 ID_Key='',
                 Cantidad_personas=0,
-                Fecha='',
-                Hora='',
+                Fecha=datetime(1970, 1, 1),
+                Hora=datetime(1970, 1, 1, 0, 0, 0).time(),
                 Codigo_reserva='',
                 Comentarios='',
                 Precio=0,
-                Preorden=0,
+                Preorden=False,
                 ID_Restaurante='',
                 ID_Cliente='',
                 resultado=f"Consultar Reserva Fallido: {ex}"
@@ -118,25 +125,25 @@ class Infraestructura_Reserva():
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()
 
-            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            # Si hay resultados, los transformamos en objetos de tipo Reserva
             if raw_results:
                 for raw_result in raw_results:
                     # Convertir cada tupla en un diccionario
-                    cliente_dict = {
+                    reserva_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Cantidad_personas': str(raw_result[1]),
-                        'Fecha': raw_result[2],
-                        'Hora': raw_result[3],
+                        'Cantidad_personas': raw_result[1],
+                        'Fecha': datetime.strptime(raw_result[2], '%Y-%m-%d') if raw_result[2] else datetime(1970, 1, 1),
+                        'Hora': datetime.strptime(raw_result[3], '%H:%M:%S').time() if raw_result[3] else datetime(1970, 1, 1, 0, 0, 0).time(),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
-                        'Precio': str(raw_result[6]),
-                        'Preorden': str(raw_result[7]),
+                        'Precio': raw_result[6],
+                        'Preorden': raw_result[7],
                         'ID_Restaurante': raw_result[8],
-                        'ID_Cliente': raw_result[9],                                             
+                        'ID_Cliente': raw_result[9],
                         'resultado': 'Exitoso'
                     }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Reserva(**cliente_dict))
+                    # Convertir el diccionario en un objeto Reserva y agregarlo al resultado
+                    resultado.append(Modelo_Reserva(**reserva_dict))
 
             cursor.close()
 
@@ -145,12 +152,12 @@ class Infraestructura_Reserva():
             resultado = [Modelo_Reserva(
                 ID_Key='',
                 Cantidad_personas=0,
-                Fecha='',
-                Hora='',
+                Fecha=datetime(1970, 1, 1),
+                Hora=datetime(1970, 1, 1, 0, 0, 0).time(),
                 Codigo_reserva='',
                 Comentarios='',
                 Precio=0,
-                Preorden=0,
+                Preorden=False,
                 ID_Restaurante='',
                 ID_Cliente='',
                 resultado=f"Consultar Reserva Fallido: {ex}"
