@@ -75,8 +75,8 @@ class Infraestructura_Reserva():
                         'Hora': str(raw_result[3]),
                         'Codigo_reserva': raw_result[4],
                         'Comentarios': raw_result[5],
-                        'Precio': str(raw_result[6]),
-                        'Preorden': str(raw_result[7]),
+                        'Precio': raw_result[6],
+                        'Preorden': raw_result[7],
                         'ID_Restaurante': raw_result[8],
                         'ID_Cliente': raw_result[9],                                             
                         'resultado': 'Exitoso'
