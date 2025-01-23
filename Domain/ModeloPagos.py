@@ -1,15 +1,16 @@
+from datetime import date, time  # Cambia el import
 from pydantic import BaseModel
 
 class Modelo_Pagos(BaseModel):
     ID_Key: str
     Nombre_Cliente: str
-    Subtotal: str
-    Iva : str
-    Total : str
+    Subtotal: int
+    Iva : int
+    Total : int
     Metodo_de_pago: str
-    Fecha: str
-    Fecha_Vencimiento: str
-    Tiempo: str
+    Fecha: date
+    Fecha_Vencimiento: date
+    Tiempo: time
     Logo: str
     ID_Restaurante: str
     ID_Pedido: str
