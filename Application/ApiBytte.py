@@ -29,6 +29,7 @@ import uvicorn
 import os
 from fastapi.responses import JSONResponse
 from json import JSONDecodeError
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Web API Bytte",
@@ -64,6 +65,9 @@ async def json_decode_exception_handler(request: Request, exc: JSONDecodeError):
         status_code=400,
         content={"detail": "JSON decode error. Please check your request body."},
     )
+
+class IDModel(BaseModel):
+    ID_Key: str
 
 #####################################
 @app.post(
@@ -101,9 +105,9 @@ async def modificar_restaurante(ID_Key:str,modelorestaurante: Modelo_Restaurante
     summary="Eliminar Restaurante",
     tags=["Restaurante"]
 )
-async def retirar_restaurante(ID_Key: str, modelorestaurante: Modelo_Restaurante) -> Modelo_Restaurante:
+async def retirar_restaurante(reserva_id: IDModel) -> Modelo_Restaurante:
     infraestructurarestaurante = Infraestructura_Restaurante()
-    return infraestructurarestaurante.retirar_restaurante(ID_Key, modelorestaurante)
+    return infraestructurarestaurante.retirar_restaurante(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarRestaurante",
@@ -150,16 +154,19 @@ async def modificar_reserva(ID_Key:str,modeloreserva: Modelo_Reserva)->Modelo_Re
     infraestructurareserva = Infraestructura_Reserva()
     return infraestructurareserva.modificar_reserva(ID_Key, modeloreserva)
 
+class ReservaID(BaseModel):
+    ID_Key: str
+
 @app.delete(
     "/EliminarReserva",
-    response_model= Modelo_Reserva,
+    response_model=Modelo_Reserva,
     description="Eliminar Reserva",
     summary="Eliminar Reserva",
     tags=["Reserva"]
 )
-async def retirar_reserva(ID_Key: str, modeloreserva: Modelo_Reserva) -> Modelo_Reserva:
+async def retirar_reserva(reserva_id: IDModel) -> Modelo_Reserva:
     infraestructurareserva = Infraestructura_Reserva()
-    return infraestructurareserva.retirar_reserva(ID_Key, modeloreserva)
+    return infraestructurareserva.retirar_reserva(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarReserva",
@@ -213,9 +220,9 @@ async def modificar_rol(ID_Key:str,modelorol: Modelo_Rol)->Modelo_Rol:
     summary="Eliminar Rol",
     tags=["Rol"]
 )
-async def retirar_rol(ID_Key: str, modelorol: Modelo_Rol) -> Modelo_Rol:
+async def retirar_rol(reserva_id: IDModel) -> Modelo_Rol:
     infraestructurarol = Infraestructura_Rol()
-    return infraestructurarol.retirar_rol(ID_Key, modelorol)
+    return infraestructurarol.retirar_rol(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarRol",
@@ -270,9 +277,9 @@ async def modificar_cliente(ID_Key:str,modelocliente: Modelo_Cliente)->Modelo_Cl
     summary="Eliminar Cliente",
     tags=["Cliente"]
 )
-async def retirar_cliente(ID_Key: str, modelocliente: Modelo_Cliente) -> Modelo_Cliente:
+async def retirar_cliente(reserva_id: IDModel) -> Modelo_Cliente:
     infraestructuracliente = Infraestructura_Cliente()
-    return infraestructuracliente.retirar_cliente(ID_Key, modelocliente)
+    return infraestructuracliente.retirar_cliente(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarCliente",
@@ -326,9 +333,9 @@ async def modificar_usuario(ID_Key:str,modelousuario: Modelo_Usuario)->Modelo_Us
     summary="Eliminar Usuario",
     tags=["Usuario"]
 )
-async def retirar_usuario(ID_Key: str, modelousuario: Modelo_Usuario) -> Modelo_Usuario:
+async def retirar_usuario(reserva_id: IDModel) -> Modelo_Usuario:
     infraestructurausuario = Infraestructura_Usuario()
-    return infraestructurausuario.retirar_usuario(ID_Key, modelousuario)
+    return infraestructurausuario.retirar_usuario(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarUsuario",
@@ -382,9 +389,9 @@ async def modificar_ubicacion(ID_Key:str,modeloubicacion: Modelo_Ubicacion)->Mod
     summary="Eliminar Ubicacion",
     tags=["Ubicacion"]
 )
-async def retirar_ubicacion(ID_Key: str, modeloubicacion: Modelo_Ubicacion) -> Modelo_Ubicacion:
+async def retirar_ubicacion(reserva_id: IDModel) -> Modelo_Ubicacion:
     infraestructuraubicacion = Infraestructura_Ubicacion()
-    return infraestructuraubicacion.retirar_ubicacion(ID_Key, modeloubicacion)
+    return infraestructuraubicacion.retirar_ubicacion(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarUbicacion",
@@ -438,9 +445,9 @@ async def modificar_pedido(ID_Key:str,modelopedido: Modelo_Pedido)->Modelo_Pedid
     summary="Eliminar Pedido",
     tags=["Pedido"]
 )
-async def retirar_pedido(ID_Key: str, modelopedido: Modelo_Pedido) -> Modelo_Pedido:
+async def retirar_pedido(reserva_id: IDModel) -> Modelo_Pedido:
     infraestructurapedido = Infraestructura_Pedido()
-    return infraestructurapedido.retirar_pedido(ID_Key, modelopedido)
+    return infraestructurapedido.retirar_pedido(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarPedido",
@@ -494,9 +501,9 @@ async def modificar_categoria(ID_Key:str,modelocategoria: Modelo_Categorias)->Mo
     summary="Eliminar Categorias",
     tags=["Categorias"]
 )
-async def retirar_categoria(ID_Key: str, modelocategoria: Modelo_Categorias) -> Modelo_Categorias:
+async def retirar_categoria(reserva_id: IDModel) -> Modelo_Categorias:
     infraestructuracategoria = Infraestructura_Categorias()
-    return infraestructuracategoria.retirar_categoria(ID_Key, modelocategoria)
+    return infraestructuracategoria.retirar_categoria(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarCategorias",
@@ -550,9 +557,9 @@ async def modificar_etiquetas(ID_Key:str,modeloetiquetas: Modelo_Etiquetas)->Mod
     summary="Eliminar Etiquetas",
     tags=["Etiquetas"]
 )
-async def retirar_etiquetas(ID_Key: str, modeloetiquetas: Modelo_Etiquetas) -> Modelo_Etiquetas:
+async def retirar_etiquetas(reserva_id: IDModel) -> Modelo_Etiquetas:
     infraestructuraetiquetas = Infraestructura_Etiquetas()
-    return infraestructuraetiquetas.retirar_etiquetas(ID_Key, modeloetiquetas)
+    return infraestructuraetiquetas.retirar_etiquetas(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarEtiquetas",
@@ -606,9 +613,9 @@ async def modificar_super_usuario(ID_Key:str,modelosuper_usuario: Modelo_Super_U
     summary="Eliminar Super_Usuario",
     tags=["Super Usuario"]
 )
-async def retirar_super_usuario(ID_Key: str, modelosuper_usuario: Modelo_Super_Usuario) -> Modelo_Super_Usuario:
+async def retirar_super_usuario(reserva_id: IDModel) -> Modelo_Super_Usuario:
     infraestructurasuper_usuario = Infraestructura_Super_Usuario()
-    return infraestructurasuper_usuario.retirar_super_usuario(ID_Key, modelosuper_usuario)
+    return infraestructurasuper_usuario.retirar_super_usuario(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarSuperUsuario",
@@ -662,9 +669,9 @@ async def modificar_pagos(ID_Key:str,modelopagos: Modelo_Pagos)->Modelo_Pagos:
     summary="Eliminar Pagos",
     tags=["Pagos"]
 )
-async def retirar_pagos(ID_Key: str, modelopagos: Modelo_Pagos) -> Modelo_Pagos:
+async def retirar_pagos(reserva_id: IDModel) -> Modelo_Pagos:
     infraestructurapagos = Infraestructura_Pagos()
-    return infraestructurapagos.retirar_pagos(ID_Key, modelopagos)
+    return infraestructurapagos.retirar_pagos(reserva_id.ID_Key)
 
 @app.get(
     "/ConsultarPagos",
