@@ -30,6 +30,7 @@ import os
 from fastapi.responses import JSONResponse
 from json import JSONDecodeError
 from pydantic import BaseModel
+#consultar_cliente_por_numero_documento
 
 app = FastAPI(
     title="Web API Bytte",
@@ -302,6 +303,17 @@ async def consultar_cliente() -> List[Modelo_Cliente]:
 async def consultar_cliente_id(ID_Key: str) -> List[Modelo_Cliente]:
     infraestructuracliente = Infraestructura_Cliente()
     return infraestructuracliente.consultar_cliente_id(ID_Key)
+
+@app.get(
+    "/ConsultarClientePorNumeroDocumento",
+    response_model=List[Modelo_Cliente],
+    description="Consultar Cliente por Numero de Documento",
+    summary="Consultar Cliente por Numero de Documento",
+    tags=["Cliente"]
+)
+async def consultar_cliente_por_numero_documento(numero_documento: str) -> List[Modelo_Cliente]:
+    infraestructuracliente = Infraestructura_Cliente()
+    return infraestructuracliente.consultar_cliente_por_numero_documento(numero_documento)
 
 #####################################
 @app.post(
