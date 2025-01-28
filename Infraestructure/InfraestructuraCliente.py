@@ -11,7 +11,13 @@ class Infraestructura_Cliente():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
+            args=[modelocliente.Nombre, 
+            modelocliente.Apellido, 
+            modelocliente.Telefono, 
+            modelocliente.Correo, 
+            modelocliente.Contrasena, 
+            modelocliente.Tipo_Documento, 
+            modelocliente.Numero_Documento]
             cursor.callproc("CrearCliente",args)
             db.commit()
             cursor.close()
@@ -28,7 +34,14 @@ class Infraestructura_Cliente():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
+            args=[ID_Key,
+            modelocliente.Nombre, 
+            modelocliente.Apellido, 
+            modelocliente.Telefono, 
+            modelocliente.Correo, 
+            modelocliente.Contrasena, 
+            modelocliente.Tipo_Documento, 
+            modelocliente.Numero_Documento]
             cursor.callproc("ActualizarCliente", args)
             db.commit()
             cursor.close()

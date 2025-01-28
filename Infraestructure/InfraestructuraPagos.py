@@ -10,7 +10,17 @@ class Infraestructura_Pagos():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
+            args=[modelopago.Nombre_Cliente,
+            modelopago.Subtotal,
+            modelopago.Iva,
+            modelopago.Total,
+            modelopago.Metodo_de_pago,
+            modelopago.Fecha,
+            modelopago.Fecha_Vencimiento,
+            modelopago.Tiempo,
+            modelopago.Logo,
+            modelopago.ID_Restaurante,
+            modelopago.ID_Pedido]
             cursor.callproc("CrearPago",args)
             db.commit()
             cursor.close()
@@ -27,7 +37,18 @@ class Infraestructura_Pagos():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
+            args=[ID_Key,
+            modelopago.Nombre_Cliente,
+            modelopago.Subtotal,
+            modelopago.Iva,
+            modelopago.Total,
+            modelopago.Metodo_de_pago,
+            modelopago.Fecha,
+            modelopago.Fecha_Vencimiento,
+            modelopago.Tiempo,
+            modelopago.Logo,
+            modelopago.ID_Restaurante,
+            modelopago.ID_Pedido]
             cursor.callproc("ActualizarPago", args)
             db.commit()
             cursor.close()
@@ -37,6 +58,7 @@ class Infraestructura_Pagos():
         finally:
             if db and db.is_connected():
                 db.close()
+                
         return modelopago
 
     def retirar_pagos(self, ID_Key: str, modelopago: Modelo_Pagos) -> Modelo_Pagos:

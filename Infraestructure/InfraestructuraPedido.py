@@ -10,7 +10,10 @@ class Infraestructura_Pedido():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelopedido.Cantidad, modelopedido.Descripcion, modelopedido.Precio_Unitario, modelopedido.Importe]
+            args=[modelopedido.Cantidad, 
+            modelopedido.Descripcion, 
+            modelopedido.Precio_Unitario, 
+            modelopedido.Importe]
             cursor.callproc("CrearPedido",args)
             db.commit()
             cursor.close()
@@ -27,7 +30,11 @@ class Infraestructura_Pedido():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelopedido.Cantidad, modelopedido.Descripcion, modelopedido.Precio_Unitario, modelopedido.Importe]
+            args=[ID_Key,
+            modelopedido.Cantidad, 
+            modelopedido.Descripcion, 
+            modelopedido.Precio_Unitario, 
+            modelopedido.Importe]
             cursor.callproc("ActualizarPedido", args)
             db.commit()
             cursor.close()
