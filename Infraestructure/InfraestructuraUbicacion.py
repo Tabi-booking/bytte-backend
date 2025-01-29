@@ -10,7 +10,10 @@ class Infraestructura_Ubicacion():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modeloubicacion.Pais,modeloubicacion.Departamento,modeloubicacion.Ciudad,modeloubicacion.Barrio]
+            args=[modeloubicacion.Pais,
+            modeloubicacion.Departamento,
+            modeloubicacion.Ciudad,
+            modeloubicacion.Barrio]
             cursor.callproc("CrearUbicacion",args)
             db.commit()
             cursor.close()
@@ -26,7 +29,11 @@ class Infraestructura_Ubicacion():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modeloubicacion.Pais,modeloubicacion.Departamento,modeloubicacion.Ciudad,modeloubicacion.Barrio]
+            args=[ID_Key,
+            modeloubicacion.Pais,
+            modeloubicacion.Departamento,
+            modeloubicacion.Ciudad,
+            modeloubicacion.Barrio]
             cursor.callproc("ActualizarUbicacion", args)
             db.commit()
             cursor.close()
