@@ -184,9 +184,9 @@ async def consultar_reserva() -> List[Modelo_Reserva]:
     summary="Consultar Reserva por ID",
     tags=["Reserva"]
 )
-async def consultar_ID_Key(ID_Key: str) -> List[Modelo_Reserva]:
+async def consultar_reserva_id(ID_Key: str) -> List[Modelo_Reserva]:
     infraestructurareserva = Infraestructura_Reserva()
-    return infraestructurareserva.consultar_ID_Key(ID_Key)
+    return infraestructurareserva.consultar_reserva_id(ID_Key)
 
 #####################################
 @app.post(
