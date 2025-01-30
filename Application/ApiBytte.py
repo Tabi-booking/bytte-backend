@@ -24,13 +24,24 @@ from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 from Infraestructure.InfraestructuraSuperUsuario import Infraestructura_Super_Usuario
 from Domain.ModeloRol import Modelo_Rol
 from Infraestructure.InfraestructuraRol import Infraestructura_Rol
+from Domain.ModeloMesajeBot import Modelo_Mensaje_Bot
 from typing import List
 import uvicorn
 import os
 from fastapi.responses import JSONResponse
 from json import JSONDecodeError
 from pydantic import BaseModel
+from twilio.rest import Client
+import requests
+import twint
+import logging
 #consultar_cliente_por_numero_documento
+
+account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+twilio_number = os.getenv("TWILIO_NUMBER")
+
+client = Client(account_sid, auth_token)
 
 app = FastAPI(
     title="Web API Bytte",
@@ -69,6 +80,9 @@ async def json_decode_exception_handler(request: Request, exc: JSONDecodeError):
 
 class reserva_id(BaseModel):
     ID_Key: str
+
+class Message(BaseModel):
+    message: str
 
 #####################################
 @app.post(
@@ -703,6 +717,34 @@ async def consultar_pagos() -> List[Modelo_Pagos]:
 async def consultar_pagos_id(ID_Key: str) -> List[Modelo_Pagos]:
     infraestructurapagos = Infraestructura_Pagos()
     return infraestructurapagos.consultar_pagos_id(ID_Key)
+
+########################################################
+
+@app.post("/send_message")
+async def send_message(message: Message):
+    try:
+        logging.info(f"Enviando mensaje: {message.message}")
+
+        response = requests.post(
+            f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json",
+            data={
+                "Body": message.message,
+                "From": twilio_number,
+                "To": "recipient_phone_number"
+            },
+            auth=(account_sid, auth_token)
+        )
+
+        if response.status_code == 201:
+            logging.info("Mensaje enviado correctamente")
+            return {"status": "Mensaje enviado correctamente"}
+        else:
+            logging.error(f"Error al enviar mensaje: {response.text}")
+            raise HTTPException(status_code=500, detail="Error al enviar mensaje")
+
+    except Exception as e:
+        logging.error(f"Ocurrió un error: {e}")
+        raise HTTPException(status_code=500, detail="Error al enviar mensaje")
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
