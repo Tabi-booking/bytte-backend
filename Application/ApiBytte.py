@@ -33,12 +33,11 @@ from json import JSONDecodeError
 from pydantic import BaseModel
 from twilio.rest import Client
 import requests
-import twint
 import logging
 #consultar_cliente_por_numero_documento
 
 account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+auth_token = os.getenv("TWILIO_ACCOUNT_TOKEN")
 twilio_number = os.getenv("TWILIO_NUMBER")
 
 client = Client(account_sid, auth_token)
@@ -721,31 +720,27 @@ async def consultar_pagos_id(ID_Key: str) -> List[Modelo_Pagos]:
 ########################################################
 
 @app.post("/send_message")
-async def send_message(message: Message):
+async def send_message(modelo_mensaje_bot: Modelo_Mensaje_Bot):
     try:
-        logging.info(f"Enviando mensaje: {message.message}")
+        logging.info(f"Enviando mensaje: {modelo_mensaje_bot.message} a {modelo_mensaje_bot.to}")
 
-        response = requests.post(
-            f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json",
-            data={
-                "Body": message.message,
-                "From": twilio_number,
-                "To": "recipient_phone_number"
-            },
-            auth=(account_sid, auth_token)
+        response = client.messages.create(
+            body=modelo_mensaje_bot.message,
+            from_=twilio_number,
+            to=f"whatsapp:{modelo_mensaje_bot.to}"
         )
 
-        if response.status_code == 201:
+        if response.error_code is None:
             logging.info("Mensaje enviado correctamente")
             return {"status": "Mensaje enviado correctamente"}
         else:
-            logging.error(f"Error al enviar mensaje: {response.text}")
-            raise HTTPException(status_code=500, detail="Error al enviar mensaje")
+            logging.error(f"Error al enviar mensaje: {response.error_message}")
+            raise HTTPException(status_code=400, detail=f"Error al enviar mensaje: {response.error_message}")
 
     except Exception as e:
         logging.error(f"Ocurrió un error: {e}")
-        raise HTTPException(status_code=500, detail="Error al enviar mensaje")
+        raise HTTPException(status_code=500, detail=f"Error al enviar mensaje: {e}")
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 8030))
     uvicorn.run(app, host="0.0.0.0", port=port)
