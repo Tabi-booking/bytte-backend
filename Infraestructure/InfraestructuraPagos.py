@@ -10,7 +10,17 @@ class Infraestructura_Pagos():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
+            args=[modelopago.Nombre_Cliente,
+            modelopago.Subtotal,
+            modelopago.Iva,
+            modelopago.Total,
+            modelopago.Metodo_de_pago,
+            modelopago.Fecha,
+            modelopago.Fecha_Vencimiento,
+            modelopago.Tiempo,
+            modelopago.Logo,
+            modelopago.ID_Restaurante,
+            modelopago.ID_Pedido]
             cursor.callproc("CrearPago",args)
             db.commit()
             cursor.close()
@@ -27,7 +37,18 @@ class Infraestructura_Pagos():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelopago.Nombre_Cliente,modelopago.Subtotal,modelopago.Iva,modelopago.Total,modelopago.Metodo_de_pago,modelopago.Fecha,modelopago.Fecha_Vencimiento,modelopago.Tiempo,modelopago.Logo,modelopago.ID_Restaurante,modelopago.ID_Pedido]
+            args=[ID_Key,
+            modelopago.Nombre_Cliente,
+            modelopago.Subtotal,
+            modelopago.Iva,
+            modelopago.Total,
+            modelopago.Metodo_de_pago,
+            modelopago.Fecha,
+            modelopago.Fecha_Vencimiento,
+            modelopago.Tiempo,
+            modelopago.Logo,
+            modelopago.ID_Restaurante,
+            modelopago.ID_Pedido]
             cursor.callproc("ActualizarPago", args)
             db.commit()
             cursor.close()
@@ -37,6 +58,7 @@ class Infraestructura_Pagos():
         finally:
             if db and db.is_connected():
                 db.close()
+                
         return modelopago
 
     def retirar_pagos(self, ID_Key: str, modelopago: Modelo_Pagos) -> Modelo_Pagos:
@@ -74,13 +96,13 @@ class Infraestructura_Pagos():
                     cliente_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
                         'Nombre_Cliente': raw_result[1],
-                        'Subtotal': raw_result[2],
-                        'Iva': raw_result[3],
-                        'Total': raw_result[4],
+                        'Subtotal': str(raw_result[2]),
+                        'Iva': str(raw_result[3]),
+                        'Total': str(raw_result[4]),
                         'Metodo_de_pago': raw_result[5],
-                        'Fecha': raw_result[6],
-                        'Fecha_Vencimiento': raw_result[7],
-                        'Tiempo': raw_result[8],
+                        'Fecha': str(raw_result[6]),
+                        'Fecha_Vencimiento': str(raw_result[7]),
+                        'Tiempo': str(raw_result[8]),
                         'Logo': raw_result[9],
                         'ID_Restaurante': raw_result[10],
                         'ID_Pedido': raw_result[11],
@@ -96,9 +118,9 @@ class Infraestructura_Pagos():
             resultado = [Modelo_Pagos(
                 ID_Key='',
                 Nombre_Cliente='',
-                Subtotal='',
-                Iva='',
-                Total='',
+                Subtotal=0,
+                Iva=0,
+                Total=0,
                 Metodo_de_pago='',
                 Fecha='',
                 Fecha_Vencimiento='',
@@ -132,13 +154,13 @@ class Infraestructura_Pagos():
                     cliente_dict = {
                         'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
                         'Nombre_Cliente': raw_result[1],
-                        'Subtotal': raw_result[2],
-                        'Iva': raw_result[3],
-                        'Total': raw_result[4],
+                        'Subtotal': str(raw_result[2]),
+                        'Iva': str(raw_result[3]),
+                        'Total': str(raw_result[4]),
                         'Metodo_de_pago': raw_result[5],
-                        'Fecha': raw_result[6],
-                        'Fecha_Vencimiento': raw_result[7],
-                        'Tiempo': raw_result[8],
+                        'Fecha': str(raw_result[6]),
+                        'Fecha_Vencimiento': str(raw_result[7]),
+                        'Tiempo': str(raw_result[8]),
                         'Logo': raw_result[9],
                         'ID_Restaurante': raw_result[10],
                         'ID_Pedido': raw_result[11],
@@ -154,9 +176,9 @@ class Infraestructura_Pagos():
             resultado = [Modelo_Pagos(
                 ID_Key='',
                 Nombre_Cliente='',
-                Subtotal='',
-                Iva='',
-                Total='',
+                Subtotal=0,
+                Iva=0,
+                Total=0,
                 Metodo_de_pago='',
                 Fecha='',
                 Fecha_Vencimiento='',

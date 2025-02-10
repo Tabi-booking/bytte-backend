@@ -10,7 +10,15 @@ class Infraestructura_Usuario():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.ID_Rol,modelousuario.ID_Restaurante]
+            args=[modelousuario.Nombre,
+            modelousuario.Apellido,
+            modelousuario.Telefono,
+            modelousuario.Correo,
+            modelousuario.Contrasena,
+            modelousuario.Tipo_Documento,
+            modelousuario.Numero_Documento,
+            modelousuario.ID_Rol,
+            modelousuario.ID_Restaurante]
             cursor.callproc("CrearUsuario",args)
             db.commit()
             cursor.close()
@@ -26,7 +34,16 @@ class Infraestructura_Usuario():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelousuario.Nombre,modelousuario.Apellido,modelousuario.Telefono,modelousuario.Correo,modelousuario.Contrasena,modelousuario.Tipo_Documento,modelousuario.Numero_Documento,modelousuario.ID_Rol,modelousuario.ID_Restaurante]
+            args=[ID_Key,
+            modelousuario.Nombre,
+            modelousuario.Apellido,
+            modelousuario.Telefono,
+            modelousuario.Correo,
+            modelousuario.Contrasena,
+            modelousuario.Tipo_Documento,
+            modelousuario.Numero_Documento,
+            modelousuario.ID_Rol,
+            modelousuario.ID_Restaurante]
             cursor.callproc("ActualizarUsuario", args)
             db.commit()
             cursor.close()

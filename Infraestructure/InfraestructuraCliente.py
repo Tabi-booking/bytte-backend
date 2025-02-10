@@ -1,6 +1,7 @@
 from Domain.ModeloCliente import Modelo_Cliente
 from Infraestructure.Database import get_db_connection
 from typing import List
+#LeerClientePorNumeroDocumento
 
 class Infraestructura_Cliente():
     def __init__(self) -> None:
@@ -10,7 +11,13 @@ class Infraestructura_Cliente():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
+            args=[modelocliente.Nombre, 
+            modelocliente.Apellido, 
+            modelocliente.Telefono, 
+            modelocliente.Correo, 
+            modelocliente.Contrasena, 
+            modelocliente.Tipo_Documento, 
+            modelocliente.Numero_Documento]
             cursor.callproc("CrearCliente",args)
             db.commit()
             cursor.close()
@@ -27,7 +34,14 @@ class Infraestructura_Cliente():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key,modelocliente.Nombre, modelocliente.Apellido, modelocliente.Telefono, modelocliente.Correo, modelocliente.Contrasena, modelocliente.Tipo_Documento, modelocliente.Numero_Documento]
+            args=[ID_Key,
+            modelocliente.Nombre, 
+            modelocliente.Apellido, 
+            modelocliente.Telefono, 
+            modelocliente.Correo, 
+            modelocliente.Contrasena, 
+            modelocliente.Tipo_Documento, 
+            modelocliente.Numero_Documento]
             cursor.callproc("ActualizarCliente", args)
             db.commit()
             cursor.close()
@@ -113,6 +127,56 @@ class Infraestructura_Cliente():
             cursor = db.cursor()
             cursor.callproc("LeerClientePorID", [ID_Key])
             
+            # Recogemos todos los resultados de la consulta
+            for item in list(cursor.stored_results()):
+                raw_results = item.fetchall()
+
+            # Si hay resultados, los transformamos en objetos de tipo Cliente
+            if raw_results:
+                for raw_result in raw_results:
+                    # Convertir cada tupla en un diccionario
+                    cliente_dict = {
+                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
+                        'Nombre': raw_result[1],
+                        'Apellido': raw_result[2],
+                        'Telefono': raw_result[3],
+                        'Correo': raw_result[4],
+                        'Contrasena': raw_result[5],
+                        'Tipo_Documento': raw_result[6],
+                        'Numero_Documento': raw_result[7],
+                        'resultado': 'Exitoso'
+                    }
+                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
+                    resultado.append(Modelo_Cliente(**cliente_dict))
+
+            cursor.close()
+
+        except Exception as ex:
+            # Si hay un error, añadimos un mensaje de error al resultado
+            resultado = [Modelo_Cliente(
+                ID_Key='',
+                Nombre='',
+                Apellido='',
+                Telefono='',
+                Correo='',
+                Contrasena='',
+                Tipo_Documento='',
+                Numero_Documento='',
+                resultado=f"Consultar Cliente Fallido: {ex}"
+            )]
+
+        finally:
+            db.close()
+
+        return resultado 
+    
+    def consultar_cliente_por_numero_documento(self, numero_documento: str) -> List[Modelo_Cliente]:
+        db = get_db_connection()
+        resultado = []
+        try:
+            cursor = db.cursor()
+            cursor.callproc("LeerClientePorNumeroDocumento", [numero_documento])
+                
             # Recogemos todos los resultados de la consulta
             for item in list(cursor.stored_results()):
                 raw_results = item.fetchall()

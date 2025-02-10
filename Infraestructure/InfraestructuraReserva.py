@@ -14,7 +14,15 @@ class Infraestructura_Reserva():
         try:
             db = get_db_connection()
             cursor=db.cursor()
-            args=[modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
+            args=[modeloreserva.Cantidad_personas, 
+                  modeloreserva.Fecha, 
+                  modeloreserva.Hora, 
+                  modeloreserva.Codigo_reserva, 
+                  modeloreserva.Comentarios, 
+                  modeloreserva.Precio, 
+                  modeloreserva.Preorden, 
+                  modeloreserva.ID_Restaurante, 
+                  modeloreserva.ID_Cliente]
             cursor.callproc("CrearReserva",args)
             db.commit()
             cursor.close()
@@ -31,7 +39,16 @@ class Infraestructura_Reserva():
         try:
             db = get_db_connection()
             cursor = db.cursor()
-            args=[ID_Key, modeloreserva.Cantidad_personas, modeloreserva.Fecha, modeloreserva.Hora, modeloreserva.Codigo_reserva, modeloreserva.Comentarios, modeloreserva.Precio, modeloreserva.Preorden, modeloreserva.ID_Restaurante, modeloreserva.ID_Cliente]
+            args=[ID_Key,
+            modeloreserva.Cantidad_personas, 
+            modeloreserva.Fecha, 
+            modeloreserva.Hora, 
+            modeloreserva.Codigo_reserva, 
+            modeloreserva.Comentarios, 
+            modeloreserva.Precio, 
+            modeloreserva.Preorden, 
+            modeloreserva.ID_Restaurante, 
+            modeloreserva.ID_Cliente]
             cursor.callproc("ActualizarReserva", args)
             db.commit()
             cursor.close()
