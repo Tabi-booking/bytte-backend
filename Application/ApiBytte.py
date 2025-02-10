@@ -24,23 +24,13 @@ from Domain.ModeloSuperUsuario import Modelo_Super_Usuario
 from Infraestructure.InfraestructuraSuperUsuario import Infraestructura_Super_Usuario
 from Domain.ModeloRol import Modelo_Rol
 from Infraestructure.InfraestructuraRol import Infraestructura_Rol
-from Domain.ModeloMesajeBot import Modelo_Mensaje_Bot
 from typing import List
 import uvicorn
 import os
 from fastapi.responses import JSONResponse
 from json import JSONDecodeError
 from pydantic import BaseModel
-# from twilio.rest import Client
-# import requests
-import logging
 #consultar_cliente_por_numero_documento
-
-account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_ACCOUNT_TOKEN")
-twilio_number = os.getenv("TWILIO_NUMBER")
-
-# client = Client(account_sid, auth_token)
 
 app = FastAPI(
     title="Web API Bytte",
@@ -52,7 +42,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONT_URL")],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -79,9 +69,6 @@ async def json_decode_exception_handler(request: Request, exc: JSONDecodeError):
 
 class reserva_id(BaseModel):
     ID_Key: str
-
-class Message(BaseModel):
-    message: str
 
 #####################################
 @app.post(
@@ -717,30 +704,6 @@ async def consultar_pagos_id(ID_Key: str) -> List[Modelo_Pagos]:
     infraestructurapagos = Infraestructura_Pagos()
     return infraestructurapagos.consultar_pagos_id(ID_Key)
 
-########################################################
-
-# @app.post("/send_message")
-# async def send_message(modelo_mensaje_bot: Modelo_Mensaje_Bot):
-#     try:
-#         logging.info(f"Enviando mensaje: {modelo_mensaje_bot.message} a {modelo_mensaje_bot.to}")
-
-#         response = client.messages.create(
-#             body=modelo_mensaje_bot.message,
-#             from_=twilio_number,
-#             to=f"whatsapp:{modelo_mensaje_bot.to}"
-#         )
-
-#         if response.error_code is None:
-#             logging.info("Mensaje enviado correctamente")
-#             return {"status": "Mensaje enviado correctamente"}
-#         else:
-#             logging.error(f"Error al enviar mensaje: {response.error_message}")
-#             raise HTTPException(status_code=400, detail=f"Error al enviar mensaje: {response.error_message}")
-
-#     except Exception as e:
-#         logging.error(f"Ocurrió un error: {e}")
-#         raise HTTPException(status_code=500, detail=f"Error al enviar mensaje: {e}")
-
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8030))
+    port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
