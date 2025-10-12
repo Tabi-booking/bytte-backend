@@ -12,6 +12,5 @@ class Modelo_Pagos(BaseModel):
     Fecha_Vencimiento: date
     Tiempo: time
     Logo: str
-    ID_Restaurante: str
     ID_Pedido: str
     resultado: str
