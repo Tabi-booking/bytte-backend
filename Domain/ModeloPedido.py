@@ -7,4 +7,5 @@ class Modelo_Pedido(BaseModel):
     Precio_Unitario : int
     Importe : int
     resultado: str
+    ID_Reserva: str
     

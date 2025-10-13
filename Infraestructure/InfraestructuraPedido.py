@@ -13,7 +13,9 @@ class Infraestructura_Pedido():
             args=[modelopedido.Cantidad, 
             modelopedido.Descripcion, 
             modelopedido.Precio_Unitario, 
-            modelopedido.Importe]
+            modelopedido.Importe,
+            modelopedido.ID_Reserva,
+            ]
             cursor.callproc("CrearPedido",args)
             db.commit()
             cursor.close()
@@ -34,7 +36,8 @@ class Infraestructura_Pedido():
             modelopedido.Cantidad, 
             modelopedido.Descripcion, 
             modelopedido.Precio_Unitario, 
-            modelopedido.Importe]
+            modelopedido.Importe,
+            modelopedido.ID_Reserva,]
             cursor.callproc("ActualizarPedido", args)
             db.commit()
             cursor.close()
@@ -83,7 +86,9 @@ class Infraestructura_Pedido():
                         'Cantidad': raw_result[1],
                         'Descripcion': raw_result[2],
                         'Precio_Unitario': raw_result[3],
-                        'Importe': raw_result[4],                        
+                        'Importe': raw_result[4],
+                        'ID_Reserva': raw_result[5],
+                                                
                         'resultado': 'Exitoso'
                     }
                     # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
@@ -99,6 +104,7 @@ class Infraestructura_Pedido():
                 Descripcion='',
                 Precio_Unitario='',
                 Importe='',
+                ID_Reserva='',
                 resultado=f"Consultar Pedido Fallido: {ex}"
             )]
 
@@ -127,7 +133,8 @@ class Infraestructura_Pedido():
                         'Cantidad': raw_result[1],
                         'Descripcion': raw_result[2],
                         'Precio_Unitario': raw_result[3],
-                        'Importe': raw_result[4],                        
+                        'Importe': raw_result[4],   
+                        'ID_Reserva': raw_result[5],                     
                         'resultado': 'Exitoso'
                     }
                     # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
@@ -143,6 +150,7 @@ class Infraestructura_Pedido():
                 Descripcion='',
                 Precio_Unitario='',
                 Importe='',
+                ID_Reserva='',
                 resultado=f"Consultar Pedido Fallido: {ex}"
             )]
 
