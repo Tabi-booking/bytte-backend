@@ -1561,9 +1561,25 @@ async def root() -> dict:
 @app.get("/health", tags=["Sistema"])
 @app.get("/api/v1/health", tags=["Sistema"])
 async def health_check() -> dict:
-    from Infraestructure.Database import ping_db
+    from Application.db_connection_hint import hint_for_operational_error
+    from Infraestructure.Database import db_connection_profile, ping_db_detail
 
-    return {"status": "ok", "database": "ok" if ping_db() else "error"}
+    ok, db_error = ping_db_detail()
+    payload: dict = {"status": "ok", "database": "ok" if ok else "error"}
+    if not ok:
+        profile = db_connection_profile()
+        payload["database_config"] = profile
+        if db_error:
+            payload["database_error"] = db_error
+        hint = hint_for_operational_error(Exception(db_error or ""))
+        if hint:
+            payload["hint"] = hint
+        if profile.get("vercel_unsafe_direct"):
+            payload["fix"] = (
+                "Elimina DB_HOST/DB_PASSWORD en Vercel o cámbialos al Session pooler "
+                "(host *pooler.supabase.com, puerto 6543, usuario postgres.<project_ref>)."
+            )
+    return payload
 
 
 if __name__ == "__main__":
