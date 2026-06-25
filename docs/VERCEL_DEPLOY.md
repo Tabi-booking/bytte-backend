@@ -16,7 +16,8 @@ Guía para publicar **bytte-backend** (FastAPI) como función serverless en [Ver
 
 | Archivo | Rol |
 |---------|-----|
-| `index.py` | Entrada ASGI (`app`) que Vercel detecta |
+| `api/index.py` | Entrada ASGI que Vercel detecta (`app`) |
+| `index.py` | Alias local: `uvicorn index:app --reload` |
 | `vercel.json` | `maxDuration` 30s, install con `requirements.txt` |
 | `pyproject.toml` | Python ≥3.12, `tool.vercel.entrypoint` |
 | `.vercelignore` | Excluye tests, venv, docs del bundle |

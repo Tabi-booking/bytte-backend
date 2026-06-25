@@ -1,9 +1,9 @@
-"""Punto de entrada ASGI para Vercel y despliegues serverless.
+"""Punto de entrada ASGI local (Vercel usa `api/index.py`).
 
-Uso local equivalente:
+Uso local:
     uvicorn index:app --reload
 """
 
-from Application.ApiBytte import app
+from api.index import app
 
 __all__ = ["app"]
