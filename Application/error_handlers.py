@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from Infraestructure.exceptions import ConfigurationError
+from Application.db_connection_hint import hint_for_operational_error
 
 logger = logging.getLogger("bytte.api")
 
@@ -48,15 +49,19 @@ def setup_exception_handlers(app: FastAPI) -> None:
             content={"detail": str(exc), "error_type": "configuration"},
         )
 
-    async def db_connection_error(_request: Request, _exc: Exception) -> JSONResponse:
+    async def db_connection_error(_request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Error de conexión a la base de datos")
-        return JSONResponse(
-            status_code=503,
-            content={
-                "detail": "No se pudo conectar con la base de datos.",
-                "error_type": "database_connection",
-            },
-        )
+        hint = hint_for_operational_error(exc)
+        detail = "No se pudo conectar con la base de datos."
+        if hint:
+            detail = f"{detail} {hint}"
+        payload: dict[str, str] = {
+            "detail": detail,
+            "error_type": "database_connection",
+        }
+        if hint:
+            payload["hint"] = hint
+        return JSONResponse(status_code=503, content=payload)
 
     app.add_exception_handler(psycopg2.OperationalError, db_connection_error)
     app.add_exception_handler(psycopg2.InterfaceError, db_connection_error)

@@ -36,7 +36,7 @@ Configúralas en **Production** (y Preview si aplica):
 | `DB_PORT` | Recomendado | `6543` con pooler |
 | `DB_CONNECT_TIMEOUT_SEC` | Recomendado | `15` en serverless |
 | `JWT_SECRET` | Sí | Cadena larga y aleatoria |
-| `FRONT_URL` | Sí | URL del front, ej. `https://tu-app.vercel.app` |
+| `FRONT_URL` | Sí | URL del front, ej. `https://restaurante.tabiapp.tech` |
 | `SUPABASE_URL` | Sí (uploads) | URL del proyecto Supabase |
 | `SUPABASE_SERVICE_ROLE_KEY` | Sí (uploads) | Service role (solo backend) |
 | `STORAGE_BUCKET` | Sí (uploads) | `restaurant-documents` |
@@ -125,6 +125,46 @@ pytest -m "not integration"
 ---
 
 ## Solución de problemas
+
+### Error exacto: `Cannot assign requested address` / `db.*.supabase.co` puerto 5432
+
+En los logs de Vercel verás algo como:
+
+```text
+psycopg2.OperationalError: connection to server at "db.bakkcbqdcuktgmzztxcr.supabase.co"
+(2600:1f14:...) port 5432 failed: Cannot assign requested address
+```
+
+**Causa:** la función serverless intenta la conexión **directa** a Supabase (IPv6, puerto 5432). Vercel no puede usar ese endpoint de forma fiable.
+
+**Solución (Vercel → Project → Settings → Environment Variables → Production):**
+
+1. Abre [Supabase Dashboard](https://supabase.com/dashboard) → tu proyecto → **Database** → **Connection string**.
+2. Elige **Session pooler** (no *Direct connection*).
+3. Copia la URI (host tipo `aws-0-<region>.pooler.supabase.com`, puerto **6543**, usuario `postgres.<project_ref>`).
+
+**Opción A — solo `DATABASE_URL` (recomendado):**
+
+```env
+DATABASE_URL=postgresql://postgres.bakkcbqdcuktgmzztxcr:TU_PASSWORD@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require
+```
+
+Elimina o deja vacías `DB_HOST` y `DB_PASSWORD` si existen: **tienen prioridad** sobre `DATABASE_URL`.
+
+**Opción B — variables `DB_*`:**
+
+```env
+DB_HOST=aws-0-us-east-1.pooler.supabase.com
+DB_PORT=6543
+DB_USER=postgres.bakkcbqdcuktgmzztxcr
+DB_PASSWORD=TU_PASSWORD
+DB_NAME=postgres
+DB_SSLMODE=require
+DB_CONNECT_TIMEOUT_SEC=15
+```
+
+4. **Redeploy** (Deployments → ⋮ → Redeploy) para que las funciones carguen las nuevas vars.
+5. Comprueba: `curl https://bytte-backend.vercel.app/health` → `"database":"ok"`.
 
 | Síntoma | Acción |
 |---------|--------|
