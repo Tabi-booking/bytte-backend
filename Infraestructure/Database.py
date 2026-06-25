@@ -107,8 +107,57 @@ def check_db_connection():
             print(" Conexión cerrada.")
 
 
+def db_connection_profile() -> dict[str, str | int | bool]:
+    """Resumen seguro de cómo se conectará (sin contraseñas). Para /health."""
+    host = os.getenv("DB_HOST")
+    password = os.getenv("DB_PASSWORD")
+    url = (os.getenv("DATABASE_URL") or "").strip()
+    if host and password:
+        port = int(os.getenv("DB_PORT", "5432"))
+        user = os.getenv("DB_USER", "postgres")
+        direct_supabase = "db." in host and "supabase.co" in host and port == 5432
+        pooler = "pooler.supabase.com" in host and port == 6543
+        return {
+            "mode": "db_host",
+            "host": host,
+            "port": port,
+            "user": user,
+            "uses_direct_supabase_host": direct_supabase,
+            "uses_session_pooler": pooler,
+            "vercel_unsafe_direct": bool(
+                direct_supabase and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
+            ),
+        }
+    if url:
+        from urllib.parse import urlparse
+
+        parsed = urlparse(url)
+        port = parsed.port or 5432
+        host = parsed.hostname or ""
+        user = parsed.username or ""
+        direct_supabase = "db." in host and "supabase.co" in host and port == 5432
+        pooler = "pooler.supabase.com" in host and port == 6543
+        return {
+            "mode": "database_url",
+            "host": host,
+            "port": port,
+            "user": user,
+            "uses_direct_supabase_host": direct_supabase,
+            "uses_session_pooler": pooler,
+            "vercel_unsafe_direct": bool(
+                direct_supabase and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
+            ),
+        }
+    return {"mode": "missing", "uses_session_pooler": False, "vercel_unsafe_direct": False}
+
+
 def ping_db() -> bool:
     """SELECT 1 con conexión corta; para /health."""
+    return ping_db_detail()[0]
+
+
+def ping_db_detail() -> tuple[bool, str | None]:
+    """SELECT 1; devuelve (ok, mensaje de error sanitizado)."""
     conn = None
     cur = None
     try:
@@ -116,9 +165,9 @@ def ping_db() -> bool:
         cur = conn.cursor()
         cur.execute("SELECT 1")
         cur.fetchone()
-        return True
-    except Exception:
-        return False
+        return True, None
+    except Exception as exc:
+        return False, str(exc).split("\n")[0][:300]
     finally:
         if cur is not None:
             cur.close()
