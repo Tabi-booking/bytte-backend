@@ -1,0 +1,26 @@
+[project]
+name = "bytte-backend"
+version = "1.0.0"
+description = "Bytte OS — API FastAPI para restaurantes"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "psycopg2-binary",
+    "python-dotenv",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "bcrypt>=4.0.1,<4.1",
+    "python-multipart",
+    "slowapi",
+    "alembic",
+    "sqlalchemy>=2.0",
+]
+
+[tool.vercel]
+entrypoint = "index.py"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: requiere PostgreSQL configurado",
+]

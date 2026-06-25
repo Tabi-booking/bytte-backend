@@ -1,7 +1,31 @@
+from typing import Any, List
+
 from Domain.ModeloCliente import Modelo_Cliente
-from Infraestructure.Database import get_db_connection
-from typing import List
-#LeerClientePorNumeroDocumento
+from Infraestructure.Database import call_pg_function, get_db_connection
+
+
+def _cell_str(value: Any) -> str:
+    """Pydantic Modelo_Cliente usa str; psycopg2 puede devolver int/uuid en columnas."""
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _row_to_cliente_dict(raw_result: tuple) -> dict:
+    return {
+        "ID_Key": _cell_str(raw_result[0]),
+        "Nombre": _cell_str(raw_result[1]),
+        "Apellido": _cell_str(raw_result[2]),
+        "Telefono": _cell_str(raw_result[3]),
+        "Correo": _cell_str(raw_result[4]),
+        "Contrasena": _cell_str(raw_result[5]),
+        "Tipo_Documento": _cell_str(raw_result[6]),
+        "Numero_Documento": _cell_str(raw_result[7]),
+        "resultado": "Exitoso",
+    }
+
+
+# LeerClientePorNumeroDocumento
 
 class Infraestructura_Cliente():
     def __init__(self) -> None:
@@ -18,14 +42,26 @@ class Infraestructura_Cliente():
             modelocliente.Contrasena, 
             modelocliente.Tipo_Documento, 
             modelocliente.Numero_Documento]
-            cursor.callproc("CrearCliente",args)
+            call_pg_function(cursor,"CrearCliente",args)
             db.commit()
+            cursor.execute(
+                """
+                SELECT id FROM public.cliente
+                WHERE LOWER(TRIM(correo)) = LOWER(TRIM(%s))
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (modelocliente.Correo,),
+            )
+            row = cursor.fetchone()
+            if row:
+                modelocliente.ID_Key = str(row[0])
             cursor.close()
             modelocliente.resultado = "Ingresar Cliente Exitoso"
         except Exception as ex:
             modelocliente.resultado = f"Ingresar Cliente Fallido:{ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocliente
     
@@ -42,14 +78,14 @@ class Infraestructura_Cliente():
             modelocliente.Contrasena, 
             modelocliente.Tipo_Documento, 
             modelocliente.Numero_Documento]
-            cursor.callproc("ActualizarCliente", args)
+            call_pg_function(cursor,"ActualizarCliente", args)
             db.commit()
             cursor.close()
             modelocliente.resultado = "Modificar Cliente Exitoso"
         except Exception as ex:
             modelocliente.resultado = f"Modificar Cliente Fallido: {ex} "
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocliente
 
@@ -59,14 +95,14 @@ class Infraestructura_Cliente():
             db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
-            cursor.callproc("EliminarCliente", args)
+            call_pg_function(cursor,"EliminarCliente", args)
             db.commit()
             cursor.close()
             modelocliente.resultado = "Retirar Cliente Exitoso"
         except Exception as ex:
             modelocliente.resultado = f"Retirar Cliente Fallido: {ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocliente
 
@@ -75,29 +111,15 @@ class Infraestructura_Cliente():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerClientes")
+            call_pg_function(cursor,"LeerClientes")
             
             # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'Apellido': raw_result[2],
-                        'Telefono': raw_result[3],
-                        'Correo': raw_result[4],
-                        'Contrasena': raw_result[5],
-                        'Tipo_Documento': raw_result[6],
-                        'Numero_Documento': raw_result[7],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Cliente(**cliente_dict))
+                    resultado.append(Modelo_Cliente(**_row_to_cliente_dict(raw_result)))
 
             cursor.close()
 
@@ -125,29 +147,15 @@ class Infraestructura_Cliente():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerClientePorID", [ID_Key])
+            call_pg_function(cursor,"LeerClientePorID", [ID_Key])
             
             # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'Apellido': raw_result[2],
-                        'Telefono': raw_result[3],
-                        'Correo': raw_result[4],
-                        'Contrasena': raw_result[5],
-                        'Tipo_Documento': raw_result[6],
-                        'Numero_Documento': raw_result[7],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Cliente(**cliente_dict))
+                    resultado.append(Modelo_Cliente(**_row_to_cliente_dict(raw_result)))
 
             cursor.close()
 
@@ -175,29 +183,15 @@ class Infraestructura_Cliente():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerClientePorNumeroDocumento", [numero_documento])
+            call_pg_function(cursor,"LeerClientePorNumeroDocumento", [numero_documento])
                 
             # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'Apellido': raw_result[2],
-                        'Telefono': raw_result[3],
-                        'Correo': raw_result[4],
-                        'Contrasena': raw_result[5],
-                        'Tipo_Documento': raw_result[6],
-                        'Numero_Documento': raw_result[7],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Cliente(**cliente_dict))
+                    resultado.append(Modelo_Cliente(**_row_to_cliente_dict(raw_result)))
 
             cursor.close()
 

@@ -1,6 +1,20 @@
 from Domain.ModeloCategorias import Modelo_Categorias
-from Infraestructure.Database import get_db_connection
-from typing import List
+from Infraestructure.Database import call_pg_function, get_db_connection
+from typing import Any, List
+
+
+def _cell_str(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _row_to_categoria_dict(raw_result: tuple) -> dict:
+    return {
+        "ID_Key": _cell_str(raw_result[0]),
+        "Nombre": _cell_str(raw_result[1]),
+        "resultado": "Exitoso",
+    }
 
 class Infraestructura_Categorias():
     def __init__(self) -> None:
@@ -11,14 +25,14 @@ class Infraestructura_Categorias():
             db = get_db_connection()
             cursor=db.cursor()
             args=[modelocategoria.Nombre]
-            cursor.callproc("CrearCategoria",args)
+            call_pg_function(cursor,"CrearCategoria",args)
             db.commit()
             cursor.close()
             modelocategoria.resultado = "Ingresar Categoria Exitoso"
         except Exception as ex:
             modelocategoria.resultado = f"Ingresar Categoria Fallido:{ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocategoria
     
@@ -28,14 +42,14 @@ class Infraestructura_Categorias():
             db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key, modelocategoria.Nombre]
-            cursor.callproc("ActualizarCategoria", args)
+            call_pg_function(cursor,"ActualizarCategoria", args)
             db.commit()
             cursor.close()
             modelocategoria.resultado = "Modificar Categoria Exitoso"
         except Exception as ex:
             modelocategoria.resultado = f"Modificar Categoria Fallido: {ex} "
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocategoria
 
@@ -45,14 +59,14 @@ class Infraestructura_Categorias():
             db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
-            cursor.callproc("EliminarCategoria", args)
+            call_pg_function(cursor,"EliminarCategoria", args)
             db.commit()
             cursor.close()
             modelocategoria.resultado = "Retirar Categoria Exitoso"
         except Exception as ex:
             modelocategoria.resultado = f"Retirar Categoria Fallido: {ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modelocategoria
 
@@ -61,23 +75,14 @@ class Infraestructura_Categorias():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerCategorias")
+            call_pg_function(cursor,"LeerCategorias")
             
-            # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Categorias(**cliente_dict))
+                    resultado.append(Modelo_Categorias(**_row_to_categoria_dict(raw_result)))
 
             cursor.close()
 
@@ -98,23 +103,14 @@ class Infraestructura_Categorias():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerCategoriaPorID", [ID_Key])
+            call_pg_function(cursor,"LeerCategoriaPorID", [ID_Key])
             
-            # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Categorias(**cliente_dict))
+                    resultado.append(Modelo_Categorias(**_row_to_categoria_dict(raw_result)))
 
             cursor.close()
 

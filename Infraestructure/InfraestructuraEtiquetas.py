@@ -1,6 +1,21 @@
 from Domain.ModeloEtiquetas import Modelo_Etiquetas
-from Infraestructure.Database import get_db_connection
-from typing import List
+from Infraestructure.Database import call_pg_function, get_db_connection
+from typing import Any, List
+
+
+def _cell_str(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _row_to_etiqueta_dict(raw_result: tuple) -> dict:
+    return {
+        "ID_Key": _cell_str(raw_result[0]),
+        "Nombre": _cell_str(raw_result[1]),
+        "svg": _cell_str(raw_result[2]),
+        "resultado": "Exitoso",
+    }
 
 class Infraestructura_Etiquetas():
     def __init__(self) -> None:
@@ -11,14 +26,14 @@ class Infraestructura_Etiquetas():
             db = get_db_connection()
             cursor=db.cursor()
             args=[modeloetiqueta.Nombre or '', modeloetiqueta.svg or '']
-            cursor.callproc("CrearEtiqueta",args)
+            call_pg_function(cursor,"CrearEtiqueta",args)
             db.commit()
             cursor.close()
             modeloetiqueta.resultado = "Ingresar Etiqueta Exitoso"
         except Exception as ex:
             modeloetiqueta.resultado = f"Ingresar Etiqueta Fallido:{ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modeloetiqueta
     
@@ -28,14 +43,14 @@ class Infraestructura_Etiquetas():
             db = get_db_connection()
             cursor = db.cursor()
             args=[ID_Key, modeloetiqueta.Nombre or '', modeloetiqueta.svg or '']
-            cursor.callproc("ActualizarEtiqueta", args)
+            call_pg_function(cursor,"ActualizarEtiqueta", args)
             db.commit()
             cursor.close()
             modeloetiqueta.resultado = "Modificar Etiqueta Exitoso"
         except Exception as ex:
             modeloetiqueta.resultado = f"Modificar Etiqueta Fallido: {ex} "
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modeloetiqueta
 
@@ -45,14 +60,14 @@ class Infraestructura_Etiquetas():
             db = get_db_connection()
             cursor = db.cursor()
             args = [ID_Key]
-            cursor.callproc("EliminarEtiqueta", args)
+            call_pg_function(cursor,"EliminarEtiqueta", args)
             db.commit()
             cursor.close()
             modeloetiqueta.resultado = "Retirar Etiqueta Exitoso"
         except Exception as ex:
             modeloetiqueta.resultado = f"Retirar Etiqueta Fallido: {ex}"
         finally:
-            if db and db.is_connected():
+            if db is not None and not db.closed:
                 db.close()
         return modeloetiqueta
 
@@ -61,24 +76,15 @@ class Infraestructura_Etiquetas():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerEtiquetas")
+            call_pg_function(cursor,"LeerEtiquetas")
             
             # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'svg': raw_result[2],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Etiquetas(**cliente_dict))
+                    resultado.append(Modelo_Etiquetas(**_row_to_etiqueta_dict(raw_result)))
 
             cursor.close()
 
@@ -101,24 +107,15 @@ class Infraestructura_Etiquetas():
         resultado = []
         try:
             cursor = db.cursor()
-            cursor.callproc("LeerEtiquetaPorID", [ID_Key])
+            call_pg_function(cursor,"LeerEtiquetaPorID", [ID_Key])
             
             # Recogemos todos los resultados de la consulta
-            for item in list(cursor.stored_results()):
-                raw_results = item.fetchall()
+            raw_results = cursor.fetchall()
 
             # Si hay resultados, los transformamos en objetos de tipo Cliente
             if raw_results:
                 for raw_result in raw_results:
-                    # Convertir cada tupla en un diccionario
-                    cliente_dict = {
-                        'ID_Key': raw_result[0],  # Ajusta los índices según el orden de tus columnas
-                        'Nombre': raw_result[1],
-                        'svg': raw_result[2],
-                        'resultado': 'Exitoso'
-                    }
-                    # Convertir el diccionario en un objeto Cliente y agregarlo al resultado
-                    resultado.append(Modelo_Etiquetas(**cliente_dict))
+                    resultado.append(Modelo_Etiquetas(**_row_to_etiqueta_dict(raw_result)))
 
             cursor.close()
 
