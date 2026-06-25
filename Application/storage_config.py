@@ -6,6 +6,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
+from Application.env_aliases import env_first
+
 
 @dataclass(frozen=True)
 class StorageSettings:
@@ -32,11 +34,14 @@ def load_storage_settings() -> StorageSettings:
     supabase_url = _env("SUPABASE_URL").rstrip("/")
     bucket = _env("STORAGE_BUCKET", "restaurant-documents")
     public_url = _env("STORAGE_PUBLIC_URL").rstrip("/")
+    storage_url = _env("STORAGE_URL").rstrip("/")
+    if not public_url and storage_url and bucket:
+        public_url = f"{storage_url}/object/public/{bucket}"
     if not public_url and supabase_url and bucket:
         public_url = f"{supabase_url}/storage/v1/object/public/{bucket}"
     return StorageSettings(
         supabase_url=supabase_url,
-        service_role_key=_env("SUPABASE_SERVICE_ROLE_KEY"),
+        service_role_key=env_first("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY"),
         bucket=bucket,
         public_url_base=public_url,
     )
@@ -59,6 +64,6 @@ def require_storage_settings() -> StorageSettings:
 
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Almacenamiento no configurado (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STORAGE_BUCKET, STORAGE_PUBLIC_URL)",
+            detail="Almacenamiento no configurado (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY o SUPABASE_SERVICE_KEY, STORAGE_BUCKET)",
         )
     return settings

@@ -5,8 +5,19 @@ from __future__ import annotations
 import os
 
 
+def _split_origins(raw: str) -> list[str]:
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
 def cors_origins() -> list[str]:
-    """FRONT_URL admite varios orígenes separados por coma."""
+    """CORS_ORIGINS o FRONT_URL (varios orígenes separados por coma). * = todos."""
+    candidates: list[str] = []
+    for env_name in ("CORS_ORIGINS", "FRONT_URL"):
+        candidates.extend(_split_origins(os.getenv(env_name) or ""))
+
+    if "*" in candidates:
+        return ["*"]
+
     origins: list[str] = []
     seen: set[str] = set()
 
@@ -16,8 +27,8 @@ def cors_origins() -> list[str]:
             seen.add(o)
             origins.append(o)
 
-    for part in (os.getenv("FRONT_URL") or "").split(","):
-        _add(part)
+    for origin in candidates:
+        _add(origin)
 
     vercel = (os.getenv("VERCEL_URL") or "").strip()
     if vercel:
@@ -30,3 +41,8 @@ def cors_origins() -> list[str]:
     if not origins:
         _add("http://localhost:3000")
     return origins
+
+
+def cors_allow_credentials() -> bool:
+    """Con allow_origins=['*'] el navegador no permite credentials."""
+    return cors_origins() != ["*"]
