@@ -1,0 +1,14 @@
+.venv
+venv
+__pycache__
+.pytest_cache
+.cursor
+.vscode
+tests
+docs
+scripts
+alembic
+*.md
+.env
+.env.*
+!.env.example
