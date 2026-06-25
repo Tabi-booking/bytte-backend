@@ -13,20 +13,40 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_PROJECT_ROOT / ".env", override=True)
 
 
+def _default_connect_timeout() -> int:
+    raw = os.getenv("DB_CONNECT_TIMEOUT_SEC")
+    if raw:
+        try:
+            return max(1, int(raw))
+        except ValueError:
+            pass
+    # Serverless (Vercel): cold start + red; más margen que en local
+    if os.getenv("VERCEL") or os.getenv("VERCEL_ENV"):
+        return 15
+    return 3
+
+
 def get_db_connection():
     """Conecta por DB_* (recomendado con Supabase) o por DATABASE_URL."""
     host = os.getenv("DB_HOST")
     password = os.getenv("DB_PASSWORD")
+    connect_timeout = _default_connect_timeout()
     if host and password:
+        port = int(os.getenv("DB_PORT", "5432"))
+        if (
+            "db." in host
+            and "supabase.co" in host
+            and port == 5432
+            and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
+        ):
+            print(
+                "AVISO: DB_HOST apunta al host directo :5432. "
+                "En Vercel usa Session pooler (puerto 6543)."
+            )
         try:
-            ct = os.getenv("DB_CONNECT_TIMEOUT_SEC", "3")
-            try:
-                connect_timeout = max(1, int(ct))
-            except ValueError:
-                connect_timeout = 3
             return psycopg2.connect(
                 host=host,
-                port=int(os.getenv("DB_PORT", "5432")),
+                port=port,
                 user=os.getenv("DB_USER", "postgres"),
                 password=password,
                 dbname=os.getenv("DB_NAME", "postgres"),
@@ -43,11 +63,6 @@ def get_db_connection():
             "Define DB_HOST y DB_PASSWORD, o DATABASE_URL, en el entorno (.env)"
         )
     try:
-        ct = os.getenv("DB_CONNECT_TIMEOUT_SEC", "3")
-        try:
-            connect_timeout = max(1, int(ct))
-        except ValueError:
-            connect_timeout = 3
         db = psycopg2.connect(url, connect_timeout=connect_timeout)
         return db
     except Error as e:

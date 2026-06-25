@@ -1548,6 +1548,16 @@ app.include_router(onboarding_router, prefix="/api/v1")
 app.include_router(upload_router, prefix="/api/v1")
 
 
+@app.get("/", tags=["Sistema"], include_in_schema=False)
+async def root() -> dict:
+    return {
+        "service": "bytte-backend",
+        "health": "/health",
+        "docs": "/docs",
+        "api_v1": "/api/v1",
+    }
+
+
 @app.get("/health", tags=["Sistema"])
 @app.get("/api/v1/health", tags=["Sistema"])
 async def health_check() -> dict:
