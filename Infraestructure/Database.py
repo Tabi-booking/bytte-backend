@@ -26,19 +26,51 @@ def _default_connect_timeout() -> int:
     return 3
 
 
+def _is_vercel() -> bool:
+    return bool(os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
+
+
+def _is_unsafe_direct_supabase(host: str, port: int) -> bool:
+    return "db." in host and "supabase.co" in host and port == 5432
+
+
+def _connection_mode() -> str:
+    """Modo efectivo de conexión (sin abrir socket)."""
+    url = (os.getenv("DATABASE_URL") or "").strip()
+    host = (os.getenv("DB_HOST") or "").strip()
+    password = (os.getenv("DB_PASSWORD") or "").strip()
+    if _is_vercel() and url:
+        return "database_url"
+    if host and password:
+        return "db_host"
+    if url:
+        return "database_url"
+    return "missing"
+
+
 def get_db_connection():
-    """Conecta por DB_* (recomendado con Supabase) o por DATABASE_URL."""
+    """Conecta por DB_* (local) o DATABASE_URL. En Vercel prioriza DATABASE_URL."""
     host = os.getenv("DB_HOST")
     password = os.getenv("DB_PASSWORD")
+    url = (os.getenv("DATABASE_URL") or "").strip()
     connect_timeout = _default_connect_timeout()
+
+    if _is_vercel() and url:
+        if host and password:
+            port = int(os.getenv("DB_PORT", "5432"))
+            if _is_unsafe_direct_supabase(host, port):
+                print(
+                    "AVISO: En Vercel se ignora DB_HOST directo :5432; usando DATABASE_URL."
+                )
+        try:
+            return psycopg2.connect(url, connect_timeout=connect_timeout)
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
     if host and password:
         port = int(os.getenv("DB_PORT", "5432"))
-        if (
-            "db." in host
-            and "supabase.co" in host
-            and port == 5432
-            and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
-        ):
+        if _is_unsafe_direct_supabase(host, port) and _is_vercel():
             print(
                 "AVISO: DB_HOST apunta al host directo :5432. "
                 "En Vercel usa Session pooler (puerto 6543)."
@@ -57,8 +89,7 @@ def get_db_connection():
             print(f"Error: {e}")
             raise
 
-    url = os.getenv("DATABASE_URL")
-    if not url or not url.strip():
+    if not url:
         raise ConfigurationError(
             "Define DB_HOST y DB_PASSWORD, o DATABASE_URL, en el entorno (.env)"
         )
@@ -109,13 +140,16 @@ def check_db_connection():
 
 def db_connection_profile() -> dict[str, str | int | bool]:
     """Resumen seguro de cómo se conectará (sin contraseñas). Para /health."""
+    mode = _connection_mode()
     host = os.getenv("DB_HOST")
     password = os.getenv("DB_PASSWORD")
     url = (os.getenv("DATABASE_URL") or "").strip()
-    if host and password:
+    ignored_db_host = False
+
+    if mode == "db_host" and host and password:
         port = int(os.getenv("DB_PORT", "5432"))
         user = os.getenv("DB_USER", "postgres")
-        direct_supabase = "db." in host and "supabase.co" in host and port == 5432
+        direct_supabase = _is_unsafe_direct_supabase(host, port)
         pooler = "pooler.supabase.com" in host and port == 6543
         return {
             "mode": "db_host",
@@ -124,30 +158,34 @@ def db_connection_profile() -> dict[str, str | int | bool]:
             "user": user,
             "uses_direct_supabase_host": direct_supabase,
             "uses_session_pooler": pooler,
-            "vercel_unsafe_direct": bool(
-                direct_supabase and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
-            ),
+            "vercel_unsafe_direct": bool(direct_supabase and _is_vercel()),
         }
-    if url:
+
+    if mode == "database_url" and url:
         from urllib.parse import urlparse
 
         parsed = urlparse(url)
         port = parsed.port or 5432
-        host = parsed.hostname or ""
+        db_host = parsed.hostname or ""
         user = parsed.username or ""
-        direct_supabase = "db." in host and "supabase.co" in host and port == 5432
-        pooler = "pooler.supabase.com" in host and port == 6543
-        return {
+        direct_supabase = _is_unsafe_direct_supabase(db_host, port)
+        pooler = "pooler.supabase.com" in db_host and port == 6543
+        if _is_vercel() and host and password:
+            env_port = int(os.getenv("DB_PORT", "5432"))
+            ignored_db_host = _is_unsafe_direct_supabase(host, env_port)
+        profile = {
             "mode": "database_url",
-            "host": host,
+            "host": db_host,
             "port": port,
             "user": user,
             "uses_direct_supabase_host": direct_supabase,
             "uses_session_pooler": pooler,
-            "vercel_unsafe_direct": bool(
-                direct_supabase and (os.getenv("VERCEL") or os.getenv("VERCEL_ENV"))
-            ),
+            "vercel_unsafe_direct": bool(direct_supabase and _is_vercel()),
         }
+        if ignored_db_host:
+            profile["ignored_env_db_host"] = host
+        return profile
+
     return {"mode": "missing", "uses_session_pooler": False, "vercel_unsafe_direct": False}
 
 
