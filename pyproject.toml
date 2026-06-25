@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "index.py"
+entrypoint = "api/index.py"
 
 [tool.pytest.ini_options]
 markers = [
