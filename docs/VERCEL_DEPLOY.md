@@ -16,8 +16,9 @@ Guía para publicar **bytte-backend** (FastAPI) como función serverless en [Ver
 
 | Archivo | Rol |
 |---------|-----|
-| `api/index.py` | Entrada ASGI que Vercel detecta (`app`) |
+| `Application/ApiBytte.py` | App FastAPI (`app`) — entrypoint Vercel vía `pyproject.toml` |
 | `index.py` | Alias local: `uvicorn index:app --reload` |
+| `vercel.json` | Solo `installCommand` (sin bloque `functions`) |
 | `vercel.json` | `maxDuration` 30s, install con `requirements.txt` |
 | `pyproject.toml` | Python ≥3.12, `tool.vercel.entrypoint` |
 | `.vercelignore` | Excluye tests, venv, docs del bundle |
@@ -130,4 +131,5 @@ pytest -m "not integration"
 | CORS bloqueado | `FRONT_URL` debe coincidir exactamente con el `Origin` del navegador |
 | 503 base de datos | Usar Session pooler `:6543`, no host directo `:5432` |
 | 401 en rutas protegidas | Token JWT válido; re-login tras rotar `JWT_SECRET` |
-| Build falla en Python | `requires-python >=3.12` en `pyproject.toml` |
+| Build falla con `functions` / `api/index.py` | No uses bloque `functions` en `vercel.json`; el entrypoint es `Application.ApiBytte:app` en `pyproject.toml` |
+| Timeout en cold start | Dashboard → Functions → **Max Duration** 30s; `DB_CONNECT_TIMEOUT_SEC=15` |
