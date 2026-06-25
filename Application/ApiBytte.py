@@ -39,7 +39,7 @@ from Application.role_permissions import (
     PERM_USERS_READ,
     PERM_USERS_WRITE,
 )
-from Application.cors_origins import cors_origins
+from Application.cors_origins import cors_allow_credentials, cors_origins
 from Application.services.user_admin import assert_can_assign_role_id
 from Application.schemas_pagination import (
     DEFAULT_PAGE_SIZE,
@@ -106,7 +106,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins(),
-    allow_credentials=True,
+    allow_credentials=cors_allow_credentials(),
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
     allow_headers=["*"],
 )

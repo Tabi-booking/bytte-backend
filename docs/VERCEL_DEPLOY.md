@@ -35,10 +35,10 @@ Configúralas en **Production** (y Preview si aplica):
 | `DB_HOST` + `DB_PASSWORD` | Sí* | Alternativa a `DATABASE_URL` (tiene prioridad) |
 | `DB_PORT` | Recomendado | `6543` con pooler |
 | `DB_CONNECT_TIMEOUT_SEC` | Recomendado | `15` en serverless |
-| `JWT_SECRET` | Sí | Cadena larga y aleatoria |
-| `FRONT_URL` | Sí | URL del front, ej. `https://restaurante.tabiapp.tech` |
+| `JWT_SECRET` | Sí | Cadena larga y aleatoria (alias: `SECRET_KEY`) |
+| `FRONT_URL` | Sí | URL del front (alias: `CORS_ORIGINS`, `*` permitido) |
 | `SUPABASE_URL` | Sí (uploads) | URL del proyecto Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Sí (uploads) | Service role (solo backend) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Sí (uploads) | Service role (alias: `SUPABASE_SERVICE_KEY`) |
 | `STORAGE_BUCKET` | Sí (uploads) | `restaurant-documents` |
 
 \* Una de las dos formas de conexión a PostgreSQL.
@@ -52,6 +52,27 @@ FRONT_URL=http://localhost:3000,https://tabi-front.vercel.app
 ```
 
 En despliegues Vercel, también se aceptan automáticamente `VERCEL_URL` y `VERCEL_BRANCH_URL` (previews).
+
+Alias compatibles con otros backends Tabi:
+
+| Este proyecto | Alias aceptado |
+|---------------|----------------|
+| `JWT_SECRET` | `SECRET_KEY` |
+| `FRONT_URL` | `CORS_ORIGINS` (`*` desactiva `credentials` en CORS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_KEY` |
+| `STORAGE_PUBLIC_URL` | `STORAGE_URL` + bucket (deriva URL pública) |
+
+Ejemplo mínimo (mismo estilo que otros servicios; **sin** `DB_HOST`/`DB_PASSWORD`):
+
+```env
+DATABASE_URL=postgresql://postgres.<ref>:PASSWORD@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require
+SECRET_KEY=<openssl rand -hex 32>
+CORS_ORIGINS=*
+SUPABASE_URL=https://<ref>.supabase.co
+SUPABASE_SERVICE_KEY=<service_role_key>
+STORAGE_BUCKET=restaurant-documents
+STORAGE_URL=https://<ref>.supabase.co/storage/v1
+```
 
 ---
 
