@@ -41,7 +41,7 @@ Configúralas en **Production** (y Preview si aplica):
 | `SUPABASE_SERVICE_ROLE_KEY` | Sí (uploads) | Service role (alias: `SUPABASE_SERVICE_KEY`) |
 | `STORAGE_BUCKET` | Sí (uploads) | `restaurant-documents` |
 
-\* Una de las dos formas de conexión a PostgreSQL.
+\* Una de las dos formas de conexión a PostgreSQL. En **Vercel**, si `DATABASE_URL` está definida, **siempre se usa** (aunque existan `DB_HOST`/`DB_PASSWORD`).
 
 ### CORS
 
